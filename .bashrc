@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # First pull in global items
 source ~/.bash_profile
 
@@ -46,6 +45,8 @@ shopt -s checkwinsize
 
 # IP for ssh'ing into laptop
 export LAPTOP="tmenninger@192.168.98.34"
+export DESKTOP='tmenninger@192.168.1.101'
+export WORKSTATION='tmenninger@willow.ghs.com'
 
 # Gets vim packages used in vimrc
 function vim_packages() {

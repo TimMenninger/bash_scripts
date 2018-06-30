@@ -50,6 +50,7 @@ export WORKSTATION='tmenninger@willow.ghs.com'
 
 # Gets vim packages used in vimrc
 function vim_packages() {
+    echo "no packages" > /dev/null
 }
 
 # Move window

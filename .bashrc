@@ -50,61 +50,6 @@ export WORKSTATION='tmenninger@willow.ghs.com'
 
 # Gets vim packages used in vimrc
 function vim_packages() {
-    STARTING_DIR=$(pwd)
-
-    # Make sure there is a bundle and .vim directory
-    ls ~/.vim 2>/dev/null >/dev/null
-    if [ $? -ne 0 ];
-    then
-        mkdir ~/.vim
-    fi
-    ls ~/.vim/bundle 2>/dev/null >/dev/null
-    if [ $? -ne 0 ];
-    then
-        mkdir ~/.vim/bundle
-    fi
-
-    # CtrlP
-    ls ~/.vim/bundle/ctrlp.vim 2>/dev/null >/dev/null
-    if [ $? -ne 0 ];
-    then
-        git clone https://github.com/ctrlpvim/ctrlp.vim.git ~/.vim/bundle/ctrlp.vim
-        cd ~/.vim/bundle/ctrlp-cmatcher
-        ./install.sh
-    fi
-    # CtrlP extension
-    ls ~/.vim/bundle/ctrlp-cmatcher.vim 2>/dev/null >/dev/null
-    if [ $? -ne 0 ];
-    then
-        git clone https://github.com/jazzcore/ctrlp-cmatcher ~/.vim/bundle/ctrlp-cmatcher.vim
-    fi
-    # CommandT
-    ls ~/.vim/bundle/command-t.vim 2>/dev/null >/dev/null
-    if [ $? -ne 0 ];
-    then
-        git clone https://github.com/wincent/Command-T ~/.vim/bundle/command-t.vim
-    fi
-    # Multiple cursors
-    ls ~/.vim/bundle/vim-multiple-cursors.vim 2>/dev/null >/dev/null
-    if [ $? -ne 0 ];
-    then
-        git clone https://github.com/terryma/vim-multiple-cursors.git ~/.vim/bundle/vim-multiple-cursors.vim
-    fi
-    # Highlight and surround with braces
-    ls ~/.vim/bundle/vim-surround.vim 2>/dev/null >/dev/null
-    if [ $? -ne 0 ];
-    then
-        git clone https://github.com/tpope/vim-surround.git ~/.vim/bundle/vim-surround.vim
-    fi
-    # Switch between header and source files
-    ls ~/.vim/bundle/CurtineIncSw.vim 2>/dev/null >/dev/null
-    if [ $? -ne 0 ];
-    then
-        git clone https://github.com/ericcurtin/CurtineIncSw.vim ~/.vim/bundle/CurtineIncSw.vim
-    fi
-
-    # Go back to starting directory
-    cd $STARTING_DIR
 }
 
 # Move window

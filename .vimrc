@@ -70,14 +70,14 @@ nnoremap C "_C
 vnoremap C "_C
 
 " Always cut copy and paste to global buffer
-nnoremap x "+x
-vnoremap x "+x
-nnoremap y "+y
-vnoremap y "+y
-nnoremap p "+p
-vnoremap p "+p
-nnoremap P "+P
-vnoremap P "+P
+" nnoremap x "+x
+" vnoremap x "+x
+" nnoremap y "+y
+" vnoremap y "+y
+" nnoremap p "+p
+" vnoremap p "+p
+" nnoremap P "+P
+" vnoremap P "+P
 
 " Make it easier to find which pane is active
 nnoremap F <Esc>ggVG

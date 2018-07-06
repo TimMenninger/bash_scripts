@@ -5,6 +5,7 @@ source ~/.bash_profile
 export GHS_LINUXSERV_USE_64_BIT=1
 
 alias cp='cp -r'
+alias rm='rm -rf'
 
 alias ls='ls -h --color=auto'
 alias ll='ls -lah --color=auto'
@@ -122,7 +123,7 @@ function svn_mass_add() {
     source /tmp/svn_add_list
 
     # Binary files
-    svn st | grep '^?' | grep 'Binary' | sed 's/^?\S*/svn add /g' > /tmp/svn_add_list
+    svn st | grep '^?' | grep 'Binary' | grep 'bmp' | sed 's/^?\S*/svn add /g' > /tmp/svn_add_list
     source /tmp/svn_add_list
     sed -i 's/^svn add /svn propset svn:mime-type application\/octet-stream /g' /tmp/svn_add_list
     source /tmp/svn_add_list

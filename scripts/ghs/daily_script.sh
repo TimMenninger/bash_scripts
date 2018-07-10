@@ -30,6 +30,11 @@ function set_env() {
         "${NH2017}/simarm64"
     )
 
+    # Need output directory if it isn't there
+    if [ ! -d "~/out" ]; then
+        mkdir ~/out
+    fi
+
     # Success
     return 0
 }

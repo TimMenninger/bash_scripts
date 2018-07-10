@@ -1,3 +1,7 @@
 *
 !.vimrc
 !.bashrc
+!scripts
+!scripts/*
+!scripts/ghs
+!scripts/ghs/*

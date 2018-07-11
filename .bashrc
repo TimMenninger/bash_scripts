@@ -4,9 +4,6 @@ source ~/.bash_profile
 
 export GHS_LINUXSERV_USE_64_BIT=1
 
-alias cp='cp -r'
-alias rm='rm -rf'
-
 alias ls='ls -h --color=auto'
 alias ll='ls -lah --color=auto'
 alias la='ls -la'
@@ -110,6 +107,53 @@ function svn_mass_propset() {
         /usr/bin/svn propset svn:eol-style native $1
         shift
     done
+}
+
+function svn() {
+    # Handle commits
+    if [[ "$1" == "ci" || "$1" == "commit" ]]; then
+        # Get the status
+        STATUS=$(/usr/bin/svn st)
+
+        # Check for bad files
+        TEST=$(echo "$STATUS" | grep "^!")
+        if [[ "$TEST" == "" ]]; then
+            TEST=$(echo "$STATUS" | grep "^?")
+        fi
+        if [[ "$TEST" != "" ]]; then
+            echo "$STATUS"
+            return 1
+        fi
+    fi
+
+    # If here, can svn as normal
+    /usr/bin/svn $@
+}
+
+# When in svn directories, prepend 'svn' onto mkdir, mv, cp and rm
+function mv() {
+    svn mv $@ 2> /dev/null
+    if [[ $? -ne 0 ]]; then
+        /bin/mv $@
+    fi
+}
+function rm() {
+    svn del $@ 2> /dev/null
+    if [[ $? -ne 0 ]]; then
+        /bin/rm -rf $@
+    fi
+}
+function mkdir() {
+    svn mkdir $@ 2> /dev/null
+    if [[ $? -ne 0 ]]; then
+        /bin/mkdir $@
+    fi
+}
+function cp() {
+    svn cp $@ 2> /dev/null
+    if [[ $? -ne 0 ]]; then
+        /bin/cp -r $@
+    fi
 }
 
 # Add or delete all unknowns

@@ -2,33 +2,36 @@
 
 # Main loop
 function main() {
-    set_env;    if [[ $? -ne 0 ]]; then; return $?; fi
-    svn_update; if [[ $? -ne 0 ]]; then; return $?; fi
+    svn_update; if [[ $? -ne 0 ]]; then return $?; fi
     build_deps
     build_nh2017
     return 0
 }
 
+# Environment stuff
+source ~/.bashrc
+
+# Go into the nh2017 directory
+if [ -d "/tools/users/nh2017" ]; then
+    export NH2017=/tools/users/nh2017
+elif [ -d "/home/willow/nh2017" ]; then
+    export NH2017=/home/willow/nh2017
+else
+    echo "No nh2017 directory"
+    return 1
+fi
+
+# List of all directories to cd into for gbuild, absolute
+export PROJ_DIRS=(
+    "${NH2017}/linux64"
+    "${NH2017}/rcar_dynamic"
+    "${NH2017}/rcar_dynamic_no_android"
+    "${NH2017}/rcar_simple"
+    "${NH2017}/simarm64"
+)
+
 # Sets environment variables used here
 function set_env() {
-    # Go into the nh2017 directory
-    if [ -d "/tools/users/nh2017" ]; then
-        export NH2017=/tools/users/nh2017
-    elif [ -d "/home/willow/nh2017" ]; then
-        export NH2017=/home/willow/nh2017
-    else
-        echo "No nh2017 directory"
-        return 1
-    fi
-
-    # List of all directories to cd into for gbuild, absolute
-    declare -a PROJ_DIRS=(
-        "${NH2017}/linux64"
-        "${NH2017}/rcar_dynamic"
-        "${NH2017}/rcar_dynamic_no_android"
-        "${NH2017}/rcar_simple"
-        "${NH2017}/simarm64"
-    )
 
     # Need output directory if it isn't there
     if [ ! -d "~/out" ]; then
@@ -67,9 +70,27 @@ function svn_update() {
 function build_nh2017() {
     # Build all
     for i in "${PROJ_DIRS[@]}"; do
+        # Time the command
+        START=$(date +%s.%N)
+
+        # Declare what is being build
+        echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        echo "$i"
+        echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
+        # Run the gbuild command in the correct directory
         cd $i
         rm -rf bin/* objs/* hist/*
         /home/compiler/tools_devl/working/linux64-comp/gbuild -cleanfirst
+        END=$(date +%s.%N)
+        DIFF=$(echo "$END - $START" | bc)
+
+        # Print out the time
+        echo ""
+        echo "Start:    " $START
+        echo "End:      " $END
+        echo "Duration: " $DIFF
+        echo ""
     done
 }
 

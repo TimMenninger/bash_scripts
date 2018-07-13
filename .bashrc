@@ -147,20 +147,14 @@ function psh() {
 
 # STATUS
 function st() {
-    OUT="$(svn st 2> /dev/null)"
+    OUT="$(git status)"
     if [[ $? -eq 0 ]]; then
         echo "$OUT"
         return 0
     fi
 
-    OUT="$(git status 2> /dev/null)"
-    if [[ $? -eq 0 ]]; then
-        echo "$OUT"
-        return 0
-    fi
-
-    echo "Not svn or git"
-    return 1
+    svn st
+    return $?
 }
 
 # Make sure we have the vim packages
@@ -194,6 +188,7 @@ function svn() {
 
     # If here, can svn as normal
     /usr/bin/svn $@
+    return $?
 }
 
 # When in svn directories, prepend 'svn' onto mkdir, mv, cp and rm

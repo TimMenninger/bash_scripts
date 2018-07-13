@@ -133,6 +133,9 @@ function psh() {
     git status 2&>1 /dev/null
     if [[ $? -eq 128 ]]; then
         git commit
+        if [[ $? -eq 0 ]]; then
+            git push
+        fi
     fi
 
     return $?

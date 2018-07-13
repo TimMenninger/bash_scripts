@@ -97,6 +97,23 @@ alias dsstoreclean='sudo find . -name ".DS_Store" -type f -delete'
 alias ghdla='ghdl -a --ieee=synopsys -fexplicit'
 alias ghdle='ghdl -e --ieee=synopsys -fexplicit'
 
+# Standardize pulling and pushing among svn and git
+function pll() {
+    OUT="$(svn up)"
+    if [[ $? -eq 0 ]]; then
+        echo "$OUT"
+        return 0
+    fi
+
+    OUT="$(git pull)"
+    if [[ $? -eq 0 ]]; then
+        echo "$OUT"
+        return 0
+    fi
+
+    return 1
+}
+
 # Make sure we have the vim packages
 vim_packages
 

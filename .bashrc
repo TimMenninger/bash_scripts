@@ -116,6 +116,7 @@ function pll() {
         return 0
     fi
 
+    echo "Not svn or git"
     return 1
 }
 
@@ -124,6 +125,7 @@ function psh() {
     svn st 2&>1 /dev/null
     if [[ $? -eq 1 ]]; then
         svn ci
+        return $?
     fi
 
     git status 2&>1 /dev/null
@@ -136,9 +138,29 @@ function psh() {
         if [[ $? -eq 0 ]]; then
             git push
         fi
+        return $?
     fi
 
-    return $?
+    echo "Not svn or git"
+    return 1
+}
+
+# STATUS
+function st() {
+    OUT="$(svn st 2> /dev/null)"
+    if [[ $? -eq 0 ]]; then
+        echo "$OUT"
+        return 0
+    fi
+
+    OUT="$(git status 2> /dev/null)"
+    if [[ $? -eq 0 ]]; then
+        echo "$OUT"
+        return 0
+    fi
+
+    echo "Not svn or git"
+    return 1
 }
 
 # Make sure we have the vim packages

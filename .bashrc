@@ -1,1 +1,0 @@
-. ~/zonedin/scripts/env.sh

@@ -4,10 +4,6 @@ source ~/.bashrc
 
 export GHS_LINUXSERV_USE_64_BIT=1
 
-alias ls='ls -h --color=auto'
-alias ll='ls -lah --color=auto'
-alias la='ls -la'
-
 alias cls='clear; ls'
 alias lsd='ls -d */'
 
@@ -266,16 +262,20 @@ fi
 unset color_prompt force_color_prompt
 
 # enable color support of ls and also add handy aliases
+export COLOR_AUTO=""
 if [ -x /usr/bin/dircolors ]; then
+    export COLOR_AUTO="--color=auto"
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    alias ls='ls --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
-
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
 fi
+alias ls='ls $COLOR_AUTO'
+alias la='ls $COLOR_AUTO'
+alias ll='ls $COLOR_AUTO'
+alias dir='dir $COLOR_AUTO'
+alias vdir='vdir $COLOR_AUTO'
+
+alias grep='grep $COLOR_AUTO'
+alias fgrep='fgrep $COLOR_AUTO'
+alias egrep='egrep $COLOR_AUTO'
 
 # Show the git branch at command line
 parse_git_branch() {

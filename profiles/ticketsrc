@@ -1,36 +1,33 @@
 #!/bin/bash -l
 
-SCRIPTPATH="/home/willow/scripts"
+SCRIPTPATH="/home/willow/scripts/profiles"
 
 # NH2017 directory
 export NH2017="/tools/users/nh2017"
 
 # Source bash profile
-alias sourcebash="source ~/.bashrc"
+export BASH_PROFILE="/tools/users/.bashrc"
 
 # Stuff when we are on GHS network
-${SCRIPTPATH}/shared/ghs_network.sh
+source ${SCRIPTPATH}/shared/ghs_network.sh
 
 # Stuff relating to GHS tool
-${SCRIPTPATH}/shared/ghs_tools.sh
-${SCRIPTPATH}/shared/ghs_given.sh
-
-# Common items
-${SCRIPTPATH}/shared/common.sh
+source ${SCRIPTPATH}/shared/ghs_tools.sh
+source ${SCRIPTPATH}/shared/ghs_given.sh
 
 # Android stuff
-${SCRIPTPATH}/shared/android.sh
+source ${SCRIPTPATH}/shared/android.sh
 
 # NH2017 stuff
-${SCRIPTPATH}/shared/nh2017.sh
+source ${SCRIPTPATH}/shared/nh2017.sh
 
 # SVN related tools
-${SCRIPTPATH}/shared/svn.sh
+source ${SCRIPTPATH}/shared/svn.sh
 
 # Standardize version control stuff
-${SCRIPTPATH}/shared/vc.sh
+source ${SCRIPTPATH}/shared/vc.sh
 
 # Common tools
-${SCRIPTPATH}/shared/tools.sh
+source ${SCRIPTPATH}/shared/tools.sh
 
 

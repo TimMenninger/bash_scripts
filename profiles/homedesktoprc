@@ -1,6 +1,6 @@
 #!/bin/bash -l
 
-SCRIPTPATH="/home/tmenninger/scripts"
+SCRIPTPATH="/home/tmenninger/scripts/profiles"
 
 # Zonedin directory
 export ZONEDIN="/home/tmenninger/zonedin"
@@ -8,29 +8,29 @@ export ZONEDIN="/home/tmenninger/zonedin"
 # NH2017 directory
 export NH2017="/home/tmenninger/nh2017"
 
+# Bash profile
+export BASH_PROFILE="/home/tmenninger/.bashrc"
+
 # Monitors
-${SCRIPTPATH}/shared/home_desktop_monitors.sh
+source ${SCRIPTPATH}/shared/home_desktop_monitors.sh
 
 # Stuff relating to GHS tool
-${SCRIPTPATH}/shared/ghs_tools.sh
-${SCRIPTPATH}/shared/ghs_given.sh
-
-# Common items
-${SCRIPTPATH}/shared/common.sh
+source ${SCRIPTPATH}/shared/ghs_tools.sh
+source ${SCRIPTPATH}/shared/ghs_given.sh
 
 # NH2017 stuff
-${SCRIPTPATH}/shared/nh2017.sh
+source ${SCRIPTPATH}/shared/nh2017.sh
 
 # SVN related tools
-${SCRIPTPATH}/shared/svn.sh
+source ${SCRIPTPATH}/shared/svn.sh
 
 # Standardize version control stuff
-${SCRIPTPATH}/shared/vc.sh
+source ${SCRIPTPATH}/shared/vc.sh
 
 # Common tools
-${SCRIPTPATH}/shared/tools.sh
+source ${SCRIPTPATH}/shared/tools.sh
 
 # Gaming stuff
-${SCRIPTPATH}/n64.sh
-${SCRIPTPATH}/ps2.sh
+source ${SCRIPTPATH}/n64.sh
+source ${SCRIPTPATH}/ps2.sh
 

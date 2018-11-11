@@ -1,0 +1,27 @@
+#!/bin/bash -l
+
+# Absolute path this script is in, thus /home/user/bin
+SCRIPTPATH="/Users/tmenninger/scripts/profiles"
+
+# No Zonedin directory
+export ZONEDIN=".; echo \"No zoned in\""
+
+# NH2017 directory
+export NH2017="/Users/tmenninger/Documents/nh2017"
+
+# Bash profile
+alias sourcebash="source ~/.bash_profile"
+
+# NH2017 stuff
+source ${SCRIPTPATH}/shared/nh2017.sh
+
+# SVN related tools
+source ${SCRIPTPATH}/shared/svn.sh
+
+# Standardize version control stuff
+source ${SCRIPTPATH}/shared/vc.sh
+
+# Common tools
+source ${SCRIPTPATH}/shared/tools.sh
+
+

@@ -1,0 +1,36 @@
+#!/bin/bash -l
+
+SCRIPTPATH="/home/tmenninger/scripts"
+
+# Zonedin directory
+export ZONEDIN="/home/tmenninger/zonedin"
+
+# NH2017 directory
+export NH2017="/home/tmenninger/nh2017"
+
+# Monitors
+${SCRIPTPATH}/shared/home_desktop_monitors.sh
+
+# Stuff relating to GHS tool
+${SCRIPTPATH}/shared/ghs_tools.sh
+${SCRIPTPATH}/shared/ghs_given.sh
+
+# Common items
+${SCRIPTPATH}/shared/common.sh
+
+# NH2017 stuff
+${SCRIPTPATH}/shared/nh2017.sh
+
+# SVN related tools
+${SCRIPTPATH}/shared/svn.sh
+
+# Standardize version control stuff
+${SCRIPTPATH}/shared/vc.sh
+
+# Common tools
+${SCRIPTPATH}/shared/tools.sh
+
+# Gaming stuff
+${SCRIPTPATH}/n64.sh
+${SCRIPTPATH}/ps2.sh
+

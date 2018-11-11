@@ -5,6 +5,9 @@ export LAPTOP="tmenninger@192.168.98.34"
 export DESKTOP='tmenninger@192.168.1.101'
 export WORKSTATION='tmenninger@willow.ghs.com'
 
+# Editor of choice
+export EDITOR=vim
+
 alias ip='ifconfig | grep ".*Bcast" | grep -o "addr:[0-9\.]*" | grep -o "[0-9\.]*"'
 alias printsource="enscript -C -DDuplex:true -DCollate:true -G2rE -f Courier@6 --margins=20:20:15:15"
 alias dv="diffview"
@@ -79,7 +82,7 @@ alias javaclean='find . -name "*.class" -delete'
 alias pyclean='find . -name "*.pyc" -delete'
 alias racketclean='find . -name "*.rkt\~" -delete'
 alias dsstoreclean='find . -name ".DS_Store" -delete'
-alias swpclean='find . -name "*.swp" -clean;find . -name "*.swo" -delete'
+alias swpclean='find . -name "*.swp" -delete;find . -name "*.swo" -delete'
 alias patchclean='find . -name "*.orig" -delete; find . -name "*.rej" -delete'
 function clean() {
     javaclean

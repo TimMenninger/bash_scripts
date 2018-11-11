@@ -1,0 +1,8 @@
+*.swo
+*.swp
+*.class
+*.pyc
+*.rct\~
+*.orig
+*.rej
+.DS_Store

@@ -17,7 +17,6 @@ alias gb="color_gbuild"
 
 ## Bash history tweaks
 export HISTTIMEFORMAT=
-export EDITOR=vim
 
 # Special gbuild thanks to Ian
 function color_gbuild() {

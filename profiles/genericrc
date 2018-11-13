@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Make sure we have some variables
+if [ "$SCRIPTPATH" -eq "" ]; then
+    echo "WARNING: SCRIPTPATH variable not set!  This is used to find helper scripts"
+fi
+if [ "$BASH_PROFILE" -eq "" ]; then
+    echo "WARNING: BASH_PROFILE  variable not set!  This is used for sourcebash"
+fi
+
+# SVN related tools
+source ${SCRIPTPATH}/shared/svn.sh
+
+# Standardize version control stuff
+source ${SCRIPTPATH}/shared/vc.sh
+
+# Common tools
+source ${SCRIPTPATH}/shared/tools.sh
+
+# Terminal stuff
+source ${SCRIPTPATH}/shared/terminal.sh

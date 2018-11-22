@@ -15,6 +15,7 @@ source ~/.bashrc
 export PROJ_DIRS=(
     "${NH2017}/linux64"
     "${NH2017}/rcar_dynamic"
+    "${NH2017}/rcar_simple"
 )
 
 export MONO_DIRS=(

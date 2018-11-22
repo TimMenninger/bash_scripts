@@ -1,5 +1,11 @@
 #!/bin/bash -l
 
+# README
+#
+# This can take one argument, which is optional, which should be -DIN_VM if this
+# is being run for a profile on a tickets vm
+#
+
 # Paths
 PATH=/home/compiler/tools_devl/working/linux64-comp:${PATH}
 PATH=/home/multi/tools_devl/working/linux64-ide:${PATH}
@@ -11,7 +17,7 @@ PATH=${RTOS_DIR}/privutils/gcomponent:${PATH}
 export GHS_LINUXSERV_USE_64_BIT=1
 
 # gbuild binary
-export GBUILD=${GHSCOMP_DIR}/gbuild $@
+export GBUILD="${GHSCOMP_DIR}/gbuild $1"
 
 alias gb="color_gbuild"
 

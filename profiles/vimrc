@@ -62,6 +62,10 @@ map <c-m> :s:^\(\s*\)\/\/ :\1<CR>:noh<CR>
 " Use dialog to confirm unsaved changes instead of failing a command
 set confirm
 
+" Inserts a newline at current character
+nnoremap L i<CR><Esc>l
+vnoremap L i<CR><Esc>l
+
 " Remap deletes and copies away from default register
 nnoremap d "_d
 vnoremap d "_d

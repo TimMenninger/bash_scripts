@@ -8,11 +8,14 @@ export NH2017="/tools/users/nh2017"
 # Source bash profile
 export BASH_PROFILE="/tools/users/.bashrc"
 
+# Need some extra massaging if on a VM
+source ${SCRIPTPATH}/shared/tickets.sh
+
 # Stuff when we are on GHS network
 source ${SCRIPTPATH}/shared/ghs_network.sh
 
 # Stuff relating to GHS tool
-source ${SCRIPTPATH}/shared/ghs_tools.sh
+source ${SCRIPTPATH}/shared/ghs_tools.sh -DIN_VM
 source ${SCRIPTPATH}/shared/ghs_given.sh
 
 # Android stuff

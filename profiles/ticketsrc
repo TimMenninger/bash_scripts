@@ -8,6 +8,9 @@ export NH2017="/tools/users/nh2017"
 # Source bash profile
 export BASH_PROFILE="/tools/users/.bashrc"
 
+# Make sure scripts are up to date
+(cd ${SCRIPTPATH}/.. && git pull 2&>1 /dev/null)
+
 # Need some extra massaging if on a VM
 source ${SCRIPTPATH}/shared/tickets.sh
 

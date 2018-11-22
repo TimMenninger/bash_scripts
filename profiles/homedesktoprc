@@ -11,6 +11,9 @@ export NH2017="/home/tmenninger/nh2017"
 # Bash profile
 export BASH_PROFILE="/home/tmenninger/.bashrc"
 
+# Make sure scripts are up to date
+(cd ${SCRIPTPATH}/.. && git pull 2&>1 /dev/null)
+
 # Monitors
 source ${SCRIPTPATH}/shared/home_desktop_monitors.sh
 

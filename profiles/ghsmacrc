@@ -12,6 +12,9 @@ export NH2017="/Users/tmenninger/Documents/nh2017"
 # Bash profile
 export BASH_PROFILE="/Users/tmenninger/.bash_profile"
 
+# Make sure scripts are up to date
+(cd ${SCRIPTPATH}/.. && git pull 2&>1 /dev/null)
+
 # NH2017 stuff
 source ${SCRIPTPATH}/shared/nh2017.sh
 

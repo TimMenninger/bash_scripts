@@ -7,13 +7,13 @@
 
 # PULL / UPDATE
 function pll() {
-    OUT="$(svn up 2> /dev/null)"
+    OUT="$(svn up &> /dev/null)"
     if [[ $? -eq 0 ]]; then
         echo "$OUT"
         return 0
     fi
 
-    OUT="$(git pull 2> /dev/null)"
+    OUT="$(git pull &> /dev/null)"
     if [[ $? -eq 0 ]]; then
         echo "$OUT"
         return 0
@@ -25,17 +25,17 @@ function pll() {
 
 # PUSH / COMMIT
 function psh() {
-    svn st 2&>1 /dev/null
+    svn st &> /dev/null
     if [[ $? -eq 1 ]]; then
         svn ci
         return $?
     fi
 
-    git status 2&>1 /dev/null
+    git status &> /dev/null
     if [[ $? -eq 128 ]]; then
         git add .
     fi
-    git status 2&>1 /dev/null
+    git status &> /dev/null
     if [[ $? -eq 128 ]]; then
         git commit
         if [[ $? -eq 0 ]]; then
@@ -62,6 +62,6 @@ function st() {
 
 # Show the git branch at command line
 parse_git_branch() {
-    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
+    git branch &> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
 }
 export PS1="\W\[\033[33m\]\$(parse_git_branch)\[\033[00m\] $ "

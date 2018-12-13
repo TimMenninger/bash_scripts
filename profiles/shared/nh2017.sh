@@ -2,6 +2,22 @@
 
 alias nh2017="cd $NH2017"
 
+export PATH=$HOME/.local/bin:$PATH
+
+export TEST_RCAR_ADDRESS='adunlap1'
+
+function get_flanders() {
+    TEST_NUM=$1
+    if [ -z TEST_NUM ]; then
+        echo "Need test number as only argument"
+        return
+    fi
+    wget flanders.ghs.com/job/Phone/${TEST_NUM}/artifact/last_test_replay.tar.gz
+    tar -zvxf last_test_replay.tar.gz
+    mv last_test_replay flanders_build_${TEST_NUM}
+    rm last_test_replay.tar.gz
+}
+
 function run() {
     # Go to correct directory
     nh2017
@@ -59,6 +75,37 @@ reset_pipe_buffers() {
     sudo sysctl fs.pipe-max-size=16777216
     sudo sysctl -w fs.pipe-user-pages-soft=0
 }
+
+# Runs the pytest tests
+function nhtest() {
+    OPTIONS=""
+    DIRECTORY="tests"
+    POSITIONAL=()
+    while [[ $# -gt 0 ]]; do
+        arg=$1
+        case $arg in
+            --keyboard)
+                DIRECTORY="tests/keyboard"
+                ;;
+            --verbose)
+                OPTIONS+=" -s"
+                ;;
+            --linux)
+                OPTIONS+=" -m linux"
+                ;;
+            --display)
+                OPTIONS+=" --display_linux"
+                ;;
+            *)
+                POSITIONAL+=("$arg")
+                ;;
+        esac
+        shift # past argument
+    done
+
+    (cd $NH2017;pytest $OPTIONS $DIRECTORY)
+}
+alias kb_test_linux='(nh2017;nhtest --linux --keyboard --verbose --display)'
 
 # Building and updating nh2017
 function build_then_run() {

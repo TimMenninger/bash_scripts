@@ -16,6 +16,7 @@ source ${SCRIPTPATH}/shared/tickets.sh
 
 # Stuff when we are on GHS network
 source ${SCRIPTPATH}/shared/ghs_network.sh
+GHSCOMP_DIR="/t/toolsvc/trunk/linux64-comp"
 
 # Stuff relating to GHS tool
 source ${SCRIPTPATH}/shared/ghs_tools.sh -DIN_VM

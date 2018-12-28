@@ -18,6 +18,28 @@ function get_flanders() {
     rm last_test_replay.tar.gz
 }
 
+# Pre commit for linux only
+function pcl() {
+    nh2017
+    cd linux64
+    gb
+    cd ..
+    pytest -m 'linux and pre_commit' tests -P2735700001
+}
+
+# Debug the test phone number
+function dbpc() {
+    nh2017
+    cd linux64
+    ./rdebug 2735700001 $1
+}
+
+# Pre commit
+function pc() {
+    nh2017
+    ./pre_commit.sh
+}
+
 function run() {
     # Go to correct directory
     nh2017

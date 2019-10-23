@@ -37,3 +37,5 @@ source ${SCRIPTPATH}/shared/tools.sh
 source ${SCRIPTPATH}/n64.sh
 source ${SCRIPTPATH}/ps2.sh
 
+# Copy vim bundles to accessible directory
+source ${SCRIPTPATH}/shared/vim_bundles.sh

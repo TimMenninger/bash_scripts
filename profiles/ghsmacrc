@@ -27,4 +27,7 @@ source ${SCRIPTPATH}/shared/vc.sh
 # Common tools
 source ${SCRIPTPATH}/shared/tools.sh
 
+# Copy vim bundles to accessible directory
+source ${SCRIPTPATH}/shared/vim_bundles.sh
+
 

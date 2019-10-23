@@ -8,6 +8,9 @@ export WORKSTATION='tmenninger@willow.ghs.com'
 # Editor of choice
 export EDITOR=vim
 
+# UCSB Pulse VPN
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/pulse
+
 alias ip='ifconfig | grep ".*Bcast" | grep -o "addr:[0-9\.]*" | grep -o "[0-9\.]*"'
 alias printsource="enscript -C -DDuplex:true -DCollate:true -G2rE -f Courier@6 --margins=20:20:15:15"
 alias dv="diffview"
@@ -29,6 +32,7 @@ alias cll='clear; ll'
 alias lsd='ls -d */'
 alias locate1='locate -n1'
 alias off='poweroff'
+alias please='sudo'
 
 function gr () {
 	grep -irn --color --binary-files=without-match --exclude-dir=".svn*" $1 *
@@ -83,14 +87,22 @@ alias pyclean='find . -name "*.pyc" -delete'
 alias racketclean='find . -name "*.rkt\~" -delete'
 alias dsstoreclean='find . -name ".DS_Store" -delete'
 alias swpclean='find . -name "*.swp" -delete;find . -name "*.swo" -delete'
-alias patchclean='find . -name "*.orig" -delete; find . -name "*.rej" -delete'
+alias patchclean='find . -name "*.orig" -delete; find . -name "*.rej" -delete; find . -name "*.mine" -delete; find . -regextype posix-extended -regex ".*\.r[0-9]{6}" -delete'
 function clean() {
+    CD=$(pwd)
+    if [[ -d $1 ]]; then
+        CD=$1
+    fi
+
+    (
+    cd $CD
     javaclean
     pyclean
     racketclean
     dsstoreclean
     swpclean
     patchclean
+    )
 }
 
 # When in svn directories, prepend 'svn' onto mkdir, mv, cp and rm
@@ -117,4 +129,8 @@ function cp() {
     if [[ $? -ne 0 ]]; then
         /bin/cp -r $@
     fi
+}
+
+function ucsb() {
+	/usr/local/pulse/PulseClient.sh -u tmenninger -p $1 -h https://ps.vpn.ucsb.edu/ra
 }

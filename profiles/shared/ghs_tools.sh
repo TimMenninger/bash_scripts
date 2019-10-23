@@ -7,8 +7,8 @@
 #
 
 # Paths
-PATH=/home/compiler/tools_devl/working/linux64-comp:${PATH}
-PATH=/home/multi/tools_devl/working/linux64-ide:${PATH}
+PATH=${GHSCOMP_DIR}:${PATH}
+PATH=${MULTI_DIR}:${PATH}
 PATH=${TOOLS_DIR}/sitescripts:${PATH}
 PATH=${RTOS_DIR}/privutils/svn_commit:${PATH}
 PATH=${RTOS_DIR}/privutils/gcomponent:${PATH}
@@ -20,6 +20,7 @@ export GHS_LINUXSERV_USE_64_BIT=1
 export GBUILD="${GHSCOMP_DIR}/gbuild $1"
 
 alias gb="color_gbuild"
+alias pytest="/home/eng/users/tmenninger/.local/bin/pytest"
 
 ## Bash history tweaks
 export HISTTIMEFORMAT=

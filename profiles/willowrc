@@ -49,4 +49,8 @@ source ${SCRIPTPATH}/shared/tools.sh
 # Copy vim bundles to accessible directory
 source ${SCRIPTPATH}/shared/vim_bundles.sh
 
+# Put items into the path
+export PATH=$PATH:/usr/local/altera/13.1/modelsim_ase/linuxaloem
+export PATH=$PATH:/home/eng/users/tmenninger/altera/13.1/modelsim_ase/linuxaloem
+
 

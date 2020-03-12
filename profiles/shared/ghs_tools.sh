@@ -19,6 +19,8 @@ export GHS_LINUXSERV_USE_64_BIT=1
 # gbuild binary
 export GBUILD="${GHSCOMP_DIR}/gbuild $1"
 
+export PATH=/home/willow2/mtk/android/out/host/linux-x86/bin:$PATH
+
 alias gb="color_gbuild"
 alias pytest="/home/eng/users/tmenninger/.local/bin/pytest"
 

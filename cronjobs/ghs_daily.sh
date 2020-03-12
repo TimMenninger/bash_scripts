@@ -13,15 +13,22 @@ function main() {
 source ~/.bashrc
 
 # List of all directories to cd into for gbuild, absolute
-export PROJ_BUILD_CFGS=(
+export PROJ_BUILD_TARGETS=(
     # Linux build configurations
-    "linux64/default.gpj"
+    "linux64/default.gpj -cfg=debug"
+    "linux64/default.gpj -cfg=noapps"
 
     # Rcar dynamic build configurations
-    "rcar_dynamic/default.gpj"
+    "rcar_dynamic/default.gpj -cfg=history"
+    "rcar_dynamic/default.gpj -cfg=noapps"
 
     # IoT build configurations
-    "iot/default.gpj"
+    "iot/default.gpj -cfg=timemachine"
+    "iot/default.gpj -cfg=release"
+    "iot/default.gpj -cfg=debug"
+
+    # VMM
+    "bsp/demos/default.gpj -DANDROID_GUEST -cfg=debug"
 )
 
 export CHECKOUTS=(
@@ -31,11 +38,8 @@ export CHECKOUTS=(
     # Used for replays/debugging
     $DEBUG_NH2017
 
-    # Always has clean checkout
-    $NH2017/../clean-nh2017
-
     # Other checkouts
-    $NH2017/../_nh2017_{1..4}
+    $NH2017/../_nh2017_{1..2}
 )
 
 export MONO_DIRS=(
@@ -91,21 +95,11 @@ function build_deps() {
 
     # Make sure third party stuff is up to date
     cd $CHECKOUT/third_party
-    ./build_all.sh
+    ./build_third_party.sh
 }
 
 # Do some general cleaning to try and keep disk usage down
 function clean_things() {
-    # SVN clean can save space
-    cd $NH2017
-    svn cleanup
-
-    # SVN clean can save space
-    if [ -d $NH2017/../clean-nh2017 ]; then
-        cd $NH2017/../clean-nh2017
-        svn cleanup
-    fi
-
     # For one reason or another, there's a bunch of garbage placed here
     rm /tftpboot/bak/*
 }
@@ -116,6 +110,7 @@ function svn_update() {
 
     # Create patch in case we botch things
     if [[ "" == "$(svn st)" ]]; then
+        /usr/bin/svn cleanup $CHECKOUT
         /usr/bin/svn up $CHECKOUT
     fi
 
@@ -126,6 +121,9 @@ function svn_update() {
         return 1
     fi
 
+    # Remove unused images
+    rm $CHECKOUT/linux64/images/1*
+
     # Success
     return 0
 }
@@ -135,8 +133,16 @@ function build_nh2017() {
     # Remove extraneous images
     if [ -d linux64/images ]; then
         cd linux64/images
-        find . ! -name '27000' -exec rm -rf {} +
+        find . -maxdepth 1 ! -name '270000012*' -exec rm -rf {} +
+        find . -name '*.partial' -delete
+        find . -name 'TESTER' -exec rm -rf {} +
     fi
+
+    # Update all
+    for checkout in "${CHECKOUTS[@]}"; do
+        # Update the repo
+        svn_update $checkout; if [[ $? -ne 0 ]]; then continue; fi
+    done
 
     # Build all
     for checkout in "${CHECKOUTS[@]}"; do
@@ -160,13 +166,12 @@ function build_nh2017() {
         # Build dependencies
         build_deps $checkout
 
-        # Update the repo
-        svn_update $checkout; if [[ $? -ne 0 ]]; then continue; fi
-
         # Run the gbuild command in the correct directory
-        /home/aspen/my_compiler_working/linux64-comp/gbuild -cleanfirst -top $checkout -allcfg
-        END_SECS=$(date +%s)
-        END=$(date +%I:%M:%S%p)
+        for target_cfg in "${PROJ_BUILD_TARGETS[@]}"; do
+            /home/aspen/my_compiler_working/linux64-comp/gbuild -cleanfirst -top $checkout/$target_cfg
+            END_SECS=$(date +%s)
+            END=$(date +%I:%M:%S%p)
+        done
 
         DIFF=$(( $END_SECS - $START_SECS ))
 
@@ -208,26 +213,32 @@ function build_nh2017() {
     # Update the DTB
     cd "${NH2017}/rcar_dynamic/devtree"
     ./update_dtb.sh
-
-    # Build BSP stuff
-    if [ -d "${NH2017}/../nh2017_bsps" ]; then
-        cd $NH2017/../nh2017_bsps
-        /usr/bin/svn up
-        /usr/bin/svn cleanup
-    fi
 }
 
 function build_bsps() {
-    if [ -d "${NH2017}/../nh2017_bsps" ]; then
-        cd ${NH2017}/../nh2017_bsps
+    if [ -d "${NH2017}/../bsp-nh2017" ]; then
+        cd ${NH2017}/../bsp-nh2017
         /usr/bin/svn up
         svn cleanup
+    fi
+
+    if [ -d "/home/willow2/mtk/integrity" ]; then
+        cd /home/willow2/mtk/integrity
+        svn up
+        svn cleanup
+    fi
+
+    if [ -d "/home/willow2/mtk" ]; then
+        cd /home/willow2/mtk
+        (cd android; git pull)
+        (cd modem; git pull)
+        /home/willow2/mtk/scripts/build.sh
     fi
 }
 
 function run_pre_commit() {
     cd ${NH2017}
-    ./pre_commit --noiot
+    ./pre_commit.sh
 }
 
 # Time the entire thing

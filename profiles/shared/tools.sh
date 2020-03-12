@@ -88,6 +88,7 @@ alias racketclean='find . -name "*.rkt\~" -delete'
 alias dsstoreclean='find . -name ".DS_Store" -delete'
 alias swpclean='find . -name "*.swp" -delete;find . -name "*.swo" -delete'
 alias patchclean='find . -name "*.orig" -delete; find . -name "*.rej" -delete; find . -name "*.mine" -delete; find . -regextype posix-extended -regex ".*\.r[0-9]{6}" -delete'
+alias cclean='find . -name "*.o" -delete; find . -name "*.dla" -delete; find . -name "*.dnm" -delete; find . -name "a.out" -delete'
 function clean() {
     CD=$(pwd)
     if [[ -d $1 ]]; then
@@ -102,6 +103,7 @@ function clean() {
     dsstoreclean
     swpclean
     patchclean
+    cclean
     )
 }
 
@@ -131,6 +133,45 @@ function cp() {
     fi
 }
 
-function ucsb() {
-	/usr/local/pulse/PulseClient.sh -u tmenninger -p $1 -h https://ps.vpn.ucsb.edu/ra
+# Print a bar the width of the command prompt
+full_bar() {
+    printf '%*s' $(($COLUMNS-12)) | tr ' ' -;printf '  %s' $(date +"%H:%M:%S")
 }
+# Show the git branch at command line
+parse_git_branch() {
+    git branch &> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
+}
+
+# Time of last command and now so we can show duration of all commands
+PROMPT_COMMAND='build_ps1'
+
+shopt -s extdebug
+preexec_invoke_exec() {
+    [ -n "$COMP_LINE" ] && return # do nothing if completing
+    [ "$BASH_COMMAND" = "$PROMPT_COMMAND" ] && return # don't cause preexec for PROMPT_COMMAND
+
+    # So we don't get locked accidentally
+    local this_command=`HISTTIMEFORMAT= history 1 | sed -e "s/^[ ]*[0-9]*[ ]*//"`;
+    if [ "shopt -u extdebug" == "$this_command" ]; then
+        return 0
+    fi
+
+    LAST_CMD_START_TIME=$(date '+%s')
+}
+trap 'preexec_invoke_exec' DEBUG
+
+build_ps1() {
+    RUNTIME=
+    if [ ! -z $LAST_CMD_START_TIME ]; then
+        LAST_CMD_END_TIME="$(date '+%s')"
+        ELAPSED=$((LAST_CMD_END_TIME-LAST_CMD_START_TIME))
+        LAST_CMD_START_TIME=
+
+        printf '%*s' $(($COLUMNS)) | tr ' ' ' '
+        RUNTIME="Time: $(date -d "@$ELAPSED" '+%Mm %Ss') "
+    fi
+
+    export PS1="\${RUNTIME}\n\$(full_bar)\n\W $ "
+}
+
+

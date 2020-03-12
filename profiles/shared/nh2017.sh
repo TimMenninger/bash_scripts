@@ -15,11 +15,14 @@ function get_flanders() {
         echo "Need test number as only argument"
         return
     fi
-    TARBALL_NAME=replay_data
+    (
+    rm $TARBALL_NAME.tar.gz*
+    cd /home/willow/replays
+    TARBALL_NAME=commit_full_replay
     wget flanders.ghs.com/job/Phone/${TEST_NUM}/artifact/$TARBALL_NAME.tar.gz
     tar -zvxf $TARBALL_NAME.tar.gz
-    mv $TARBALL_NAME flanders_build_${TEST_NUM}
     rm $TARBALL_NAME.tar.gz
+    )
 }
 
 # Handle a report
@@ -65,10 +68,17 @@ function hr() {
         return 1
     fi
 
+    if [[ "$REPORT_PATH" != /* ]]; then
+        REPORT_PATH=$(pwd)/$REPORT_PATH
+    fi
+
     # Gbuild clean with existing changes so we don't delete something that
     # causes us to keep a stale binary
     if $REVERT; then
         /home/aspen/my_compiler_working/linux64-comp/gbuild -clean -top $DEBUG_NH2017/linux64/default.gpj -allcfg
+
+        # Cleanup
+        svn cleanup $DEBUG_NH2017
 
         # Revert existing changes
         svn revert -R $DEBUG_NH2017

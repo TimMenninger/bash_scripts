@@ -16,9 +16,6 @@ export GHS_LMWHICH="ghs"
 # Probe hostname
 export IOT_PROBE=ghprobe37563
 
-# Use common version of adb
-alias adb='/home/aspen/android/sdk/platform-tools/adb'
-
 # Point pytest to workstation
 alias pytest="/home/eng/users/tmenninger/.local/bin/pytest"
 

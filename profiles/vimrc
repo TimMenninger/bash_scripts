@@ -17,8 +17,17 @@ set nocompatible
 " Attempt to determine the type of a file based on name
 filetype indent plugin on
 
-" Show the filename at the bottom even with one file open
-set statusline+=%F
+" Highlight in red if file is unsaved
+set statusline=%#error#%m
+" Highlight in orange if readonly
+set statusline+=%#todo#%r
+" Display full filename (up to 40 characters)
+set statusline+=%*%.40F
+" Everything else is right aligned
+set statusline+=%=
+" Place cursor column, cursor line, and lines in file
+set statusline+=[%c/%l/%L]
+" Display the statusline always
 set laststatus=2
 
 " Softtabs in vim

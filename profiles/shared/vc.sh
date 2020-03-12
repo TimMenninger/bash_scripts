@@ -59,9 +59,3 @@ function st() {
     svn st
     return $?
 }
-
-# Show the git branch at command line
-parse_git_branch() {
-    git branch &> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
-}
-export PS1="\W\[\033[33m\]\$(parse_git_branch)\[\033[00m\] $ "

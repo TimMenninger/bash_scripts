@@ -3,19 +3,17 @@
 SCRIPTPATH="/home/willow/scripts/profiles"
 
 # NH2017 directory
-export NH2017="/tools/users/nh2017"
+export NH2017="/t/toolsvc/trunk/users/nh2017"
 
 # Source bash profile
-export BASH_PROFILE="/tools/users/.bashrc"
+export BASH_PROFILE="/opt/home/tmenninger/.bashrc"
 
 # Make sure scripts are up to date
 (cd ${SCRIPTPATH}/.. && git pull 2&>1 /dev/null)
 
-# Need some extra massaging if on a VM
-source ${SCRIPTPATH}/shared/tickets.sh
-
 # Stuff when we are on GHS network
 source ${SCRIPTPATH}/shared/ghs_network.sh
+GHSCOMP_DIR="/t/toolsvc/trunk/linux64-comp"
 
 # Stuff relating to GHS tool
 source ${SCRIPTPATH}/shared/ghs_tools.sh -DIN_VM

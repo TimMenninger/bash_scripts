@@ -44,3 +44,5 @@ source ${SCRIPTPATH}/shared/home_tools.sh
 # ModelSim
 export PATH=$PATH:/home/tmenninger/intelFPGA/16.1/modelsim_ase/linuxaloem
 
+# Copy vim bundles to accessible directory
+source ${SCRIPTPATH}/shared/vim_bundles.sh

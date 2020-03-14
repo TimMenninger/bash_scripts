@@ -11,6 +11,13 @@ export NH2017="/home/willow/nh2017"
 # Bash profile
 export BASH_PROFILE="/home/eng/users/tmenninger/.bashrc"
 
+# Video player paths
+export GHS_VideoPlayerPath="/home/vulcan0/bigtmp/vidstory_tools/videoplayer"
+export LD_LIBRARY_PATH="/home/vulcan0/bigtmp/vidstory_tools/libs"
+
+# Video multi dsnap reader
+alias multi_video="/home/vulcan0/bigtmp/trunk/linux64-ide/multi -GHSXHistoryVideo"
+
 # Make sure scripts are up to date
 (cd ${SCRIPTPATH}/.. && git pull 2&>1 /dev/null)
 
@@ -38,5 +45,12 @@ source ${SCRIPTPATH}/shared/vc.sh
 
 # Common tools
 source ${SCRIPTPATH}/shared/tools.sh
+
+# Copy vim bundles to accessible directory
+source ${SCRIPTPATH}/shared/vim_bundles.sh
+
+# Put items into the path
+export PATH=$PATH:/usr/local/altera/13.1/modelsim_ase/linuxaloem
+export PATH=$PATH:/home/eng/users/tmenninger/altera/13.1/modelsim_ase/linuxaloem
 
 

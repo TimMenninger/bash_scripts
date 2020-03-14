@@ -23,3 +23,7 @@ source ${SCRIPTPATH}/shared/tools.sh
 
 # Terminal stuff
 source ${SCRIPTPATH}/shared/terminal.sh
+
+# Copy vim bundles to accessible directory
+source ${SCRIPTPATH}/shared/vim_bundles.sh
+

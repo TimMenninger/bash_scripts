@@ -8,11 +8,17 @@ export WORKSTATION='tmenninger@willow.ghs.com'
 # Editor of choice
 export EDITOR=vim
 
+# UCSB Pulse VPN
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/pulse
+
+# Vivado licenses when on UCSB VPN
+export LM_LICENSE_FILE="2100@license.ece.ucsb.edu"
+
 alias ip='ifconfig | grep ".*Bcast" | grep -o "addr:[0-9\.]*" | grep -o "[0-9\.]*"'
 alias printsource="enscript -C -DDuplex:true -DCollate:true -G2rE -f Courier@6 --margins=20:20:15:15"
 alias dv="diffview"
 alias vim='stty -ixon;vim'
-alias chrome='google-chrome-stable &'
+alias chrome='(google-chrome-stable &> /dev/null) &'
 alias vimrc='vim ~/.vimrc'
 alias sourcebash='source $BASH_PROFILE'
 alias bashprofile='vim $BASH_PROFILE;sourcebash'
@@ -29,6 +35,7 @@ alias cll='clear; ll'
 alias lsd='ls -d */'
 alias locate1='locate -n1'
 alias off='poweroff'
+alias please='sudo'
 
 function gr () {
 	grep -irn --color --binary-files=without-match --exclude-dir=".svn*" $1 *
@@ -117,4 +124,8 @@ function cp() {
     if [[ $? -ne 0 ]]; then
         /bin/cp -r $@
     fi
+}
+
+function ucsb() {
+    /usr/local/pulse/pulseUi
 }

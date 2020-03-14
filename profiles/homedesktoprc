@@ -16,6 +16,7 @@ export BASH_PROFILE="/home/tmenninger/.bashrc"
 
 # Monitors
 source ${SCRIPTPATH}/shared/home_desktop_monitors.sh
+mon2
 
 # Stuff relating to GHS tool
 source ${SCRIPTPATH}/shared/ghs_tools.sh
@@ -34,6 +35,12 @@ source ${SCRIPTPATH}/shared/vc.sh
 source ${SCRIPTPATH}/shared/tools.sh
 
 # Gaming stuff
-source ${SCRIPTPATH}/n64.sh
-source ${SCRIPTPATH}/ps2.sh
+source ${SCRIPTPATH}/shared/n64.sh
+source ${SCRIPTPATH}/shared/ps2.sh
+
+# Tools for home desktop
+source ${SCRIPTPATH}/shared/home_tools.sh
+
+# ModelSim
+export PATH=$PATH:/home/tmenninger/intelFPGA/16.1/modelsim_ase/linuxaloem
 

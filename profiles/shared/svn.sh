@@ -9,6 +9,8 @@ alias gbas="sup && ./builds-ep/build_all.sh"
 alias svn16="/archive/subversion/1.6/subversion-1.6.9/subversion/svn/svn"
 alias svn17="/archive/subversion/1.7/subversion-1.7.17/subversion/svn/svn"
 
+export SVN_EDITOR="echo \"\n\nCommitted for Ticket:\" > svn-commit.tmp2;cat svn-commit.tmp >> svn-commit.tmp2;rm svn-commit.tmp;mv svn-commit.tmp2 svn-commit.tmp;vim"
+
 function svn_mass_propset() {
     while [[ $# -gt 0 ]];
     do

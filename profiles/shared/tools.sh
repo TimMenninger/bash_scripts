@@ -14,6 +14,11 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/pulse
 # Vivado licenses when on UCSB VPN
 export LM_LICENSE_FILE="2100@license.ece.ucsb.edu"
 
+function sshfs_ghs() {
+    sshfs $1:/export /home/$1
+}
+
+alias textme="/home/willow/scripts/tools/send_text.py 14846207488"
 alias ip='ifconfig | grep ".*Bcast" | grep -o "addr:[0-9\.]*" | grep -o "[0-9\.]*"'
 alias printsource="enscript -C -DDuplex:true -DCollate:true -G2rE -f Courier@6 --margins=20:20:15:15"
 alias dv="diffview"
@@ -35,7 +40,7 @@ alias cll='clear; ll'
 alias lsd='ls -d */'
 alias locate1='locate -n1'
 alias off='poweroff'
-alias please='sudo'
+alias please='sudo !!'
 
 function gr () {
 	grep -irn --color --binary-files=without-match --exclude-dir=".svn*" $1 *
@@ -134,10 +139,6 @@ function cp() {
     if [[ $? -ne 0 ]]; then
         /bin/cp -r $@
     fi
-}
-
-function ucsb() {
-    /usr/local/pulse/pulseUi
 }
 
 # Print a bar the width of the command prompt

@@ -25,6 +25,20 @@ function get_flanders() {
     )
 }
 
+function nh() {
+    if [ -z $1 ]; then
+        cd $NH2017
+    elif [ $1 -eq 0 ]; then
+        cd $NH2017
+    elif [ $1 -gt 0 ]; then
+        cd $NH2017/../_nh2017_$1
+    fi
+
+    if [ ! -z $2 ]; then
+        cd ${@:2}
+    fi
+}
+
 # Handle a report
 function hr() {
     if [[ ! -d $DEBUG_NH2017 ]]; then

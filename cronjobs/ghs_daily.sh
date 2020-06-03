@@ -2,6 +2,7 @@
 
 # Main loop
 function main() {
+    build_tools
     build_nh2017
     build_bsps
     clean_things
@@ -18,17 +19,21 @@ export PROJ_BUILD_TARGETS=(
     "linux64/default.gpj -cfg=debug"
     "linux64/default.gpj -cfg=noapps"
 
-    # Rcar dynamic build configurations
-    "rcar_dynamic/default.gpj -cfg=history"
-    "rcar_dynamic/default.gpj -cfg=noapps"
+    # MTK build configurations
+    "mtk/default.gpj -cfg=timemachine"
+    "mtk/default.gpj -cfg=release"
 
-    # IoT build configurations
-    "iot/default.gpj -cfg=timemachine"
-    "iot/default.gpj -cfg=release"
-    "iot/default.gpj -cfg=debug"
+    # Android vmm
+    "bsp/virtualization/default.gpj -cfg=checked -DANDROID"
+)
 
-    # VMM
-    "bsp/demos/default.gpj -DANDROID_GUEST -cfg=debug"
+# List of all directories to remove as part of cleaning
+export PROJ_OUT_DIRS=(
+    "linux64/noapps"
+    "linux64/debug"
+    "mtk/tm"
+    "mtk/rel"
+    "bsp/virtualization/chk"
 )
 
 export CHECKOUTS=(
@@ -39,12 +44,11 @@ export CHECKOUTS=(
     $DEBUG_NH2017
 
     # Other checkouts
-    $NH2017/../_nh2017_{1..2}
+    $NH2017/../_nh2017_{1..3}
 )
 
-export MONO_DIRS=(
-    "${NH2017}/rcar_monolith"
-)
+# Tools directory
+export MY_TOOLS_DIR="/home/willow/tools"
 
 # Takes a number of seconds and outputs Xh Ym Zs
 function format_duration() {
@@ -101,7 +105,7 @@ function build_deps() {
 # Do some general cleaning to try and keep disk usage down
 function clean_things() {
     # For one reason or another, there's a bunch of garbage placed here
-    rm /tftpboot/bak/*
+    rm -f /tftpboot/bak/*
 }
 
 # Update everything so we build on a clean slate
@@ -112,6 +116,13 @@ function svn_update() {
     if [[ "" == "$(svn st)" ]]; then
         /usr/bin/svn cleanup $CHECKOUT
         /usr/bin/svn up $CHECKOUT
+        if [[ $? -ne 0 ]]; then
+            echo "Unable to update!"
+            return 1
+        fi
+        for out_dir in "${PROJ_OUT_DIRS}"; do
+            rm -rf $out_dir
+        done
     fi
 
     # Update and only continue on success (might be merge conflicts or whatever)
@@ -128,6 +139,18 @@ function svn_update() {
     return 0
 }
 
+# Build GHS tools
+function build_tools() {
+    # Update
+    svn up $MY_TOOLS_DIR
+
+    # Build
+    $MY_TOOLS_DIR/bin/scripts/cvlink update
+    (cd $MY_TOOLS_DIR/linux-comp && ../dobuild everything_comp.all)
+    (cd $MY_TOOLS_DIR/linux-ide && ../dobuild everything_ide.all)
+    (cd $MY_TOOLS_DIR/trg && ./build_lib -fixbuildlinks -arm64 -86 -linux86 -68e -tricore -ppc -v800 -mips -arm -int86 -intcoldfire -intarm64 -intppc -intmips -intarm)
+}
+
 # Build nh2017 stuff
 function build_nh2017() {
     # Remove extraneous images
@@ -140,12 +163,20 @@ function build_nh2017() {
 
     # Update all
     for checkout in "${CHECKOUTS[@]}"; do
+        if [ ! -d $checkout ]; then
+            continue
+        fi
+
         # Update the repo
         svn_update $checkout; if [[ $? -ne 0 ]]; then continue; fi
     done
 
     # Build all
     for checkout in "${CHECKOUTS[@]}"; do
+        if [ ! -d $checkout ]; then
+            continue
+        fi
+
         # Time the command
         START_SECS=$(date +%s)
         START=$(date +%I:%M:%S%p)
@@ -182,37 +213,6 @@ function build_nh2017() {
         echo "Duration: " $(format_duration $DIFF)
         echo ""
     done
-
-    # Build monoliths
-    for i in "${MONO_DIRS[@]}"; do
-        # Time the command
-        START_SECS=$(date +%s)
-        START=$(date +%I:%M:%S%p)
-
-        # Declare what is being build
-        echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-        echo "$i"
-        echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-
-        # Run the gbuild command in the correct directory
-        cd $i
-        ./update_mono.sh
-        END_SECS=$(date +%s)
-        END=$(date +%I:%M:%S%p)
-
-        DIFF=$(( $END_SECS - $START_SECS ))
-
-        # Print out the time
-        echo ""
-        echo "Start:    " $START
-        echo "End:      " $END
-        echo "Duration: " $(format_duration $DIFF)
-        echo ""
-    done
-
-    # Update the DTB
-    cd "${NH2017}/rcar_dynamic/devtree"
-    ./update_dtb.sh
 }
 
 function build_bsps() {

@@ -13,9 +13,6 @@ export RTOS_DIR="/home/integrity/autobuild/checkouts/main/tools-main/working/rto
 export GHS_LMHOST="#ghslm1,ghslm2,ghslm3"
 export GHS_LMWHICH="ghs"
 
-# Probe hostname
-export IOT_PROBE=ghprobe37563
-
 # Point pytest to workstation
 alias pytest="/home/eng/users/tmenninger/.local/bin/pytest"
 

@@ -7,11 +7,11 @@
 #
 
 # Paths
-PATH=${GHSCOMP_DIR}:${PATH}
-PATH=${MULTI_DIR}:${PATH}
-PATH=${TOOLS_DIR}/sitescripts:${PATH}
-PATH=${RTOS_DIR}/privutils/svn_commit:${PATH}
-PATH=${RTOS_DIR}/privutils/gcomponent:${PATH}
+export PATH=${GHSCOMP_DIR}:${PATH}
+export PATH=${MULTI_DIR}:${PATH}
+export PATH=${TOOLS_DIR}/sitescripts:${PATH}
+export PATH=${RTOS_DIR}/privutils/svn_commit:${PATH}
+export PATH=${RTOS_DIR}/privutils/gcomponent:${PATH}
 
 # Stuff for using GHS tools
 export GHS_LINUXSERV_USE_64_BIT=1
@@ -31,7 +31,7 @@ export HISTTIMEFORMAT=
 function color_gbuild() {
     date
 
-    command $GBUILD "$@" |& awk -f /home/eng/users/thompson/scripts/gbuild.awk
+    command $GBUILD "$@" |& awk -f ${NH2017}/scripts/gbuild.awk
 
     return ${PIPESTATUS[0]}
 }

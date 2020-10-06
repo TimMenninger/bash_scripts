@@ -16,3 +16,9 @@ export LICENSE_FILE_DIR=/home/willow/license/
 # Point pytest to workstation
 alias pytest="/home/eng/users/tmenninger/.local/bin/pytest"
 
+# Connect to vpn
+function vpn() {
+    sudo vpnc-disconnect
+    sudo vpnc-connect ghs
+}
+

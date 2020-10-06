@@ -25,6 +25,9 @@ function get_flanders() {
     )
 }
 
+alias nh1='nh 1'
+alias nh2='nh 2'
+alias nh3='nh 3'
 function nh() {
     if [ -z $1 ]; then
         cd $NH2017
@@ -37,6 +40,64 @@ function nh() {
     if [ ! -z $2 ]; then
         cd ${@:2}
     fi
+}
+
+function aw_yis() {
+    ORIG_DIR="$(pwd)"
+
+    if [[ "$(basename $(cd ../ ; pwd))" == *"nh2017"* ]]; then
+        echo 1
+        cd ..
+    fi
+    if [[ "$(basename $(cd ../../ ; pwd))" == *"nh2017"* ]]; then
+        echo 2
+        cd ../..
+    fi
+    if [[ "$(basename $(cd ../../../ ; pwd))" == *"nh2017"* ]]; then
+        echo 3
+        cd ../../..
+    fi
+    if [[ "$(basename $(cd ../../../../ ; pwd))" == *"nh2017"* ]]; then
+        echo 4
+        cd ../../../..
+    fi
+
+    GB=/home/aspen/my_compiler_working/linux64-comp/gbuild
+    PIDS=""
+    if [[ "$(basename $(pwd))" == *"nh2017"* ]]; then
+        rm linux64/debug linux64/noapps mtk/tm mtk/rel mtk/noapps endpoints/debug endpoints/linux64
+
+        # All linux can happen in parallel
+        #
+        # MTK Timemachine and noapps must happen in series, can be parallel with
+        # linux and with release build
+        #
+        # Sequence here caters to likelihood of using it to get those done soon.
+        # Not looking necessarily for fastest solution to get all done
+        $GB -cfg=debug -top linux64/default.gpj &
+        PIDS="$PIDS $!"
+        $GB -cfg=timemachine -top mtk/default.gpj &
+        PIDS="$PIDS $!"
+        $GB -top endpoints/default.gpj &
+        PIDS="$PIDS $!"
+
+        wait $PIDS
+        PIDS=""
+
+        $GB -cfg=noapps -top linux64/default.gpj &
+        PIDS="$PIDS $!"
+        $GB -cfg=release -top mtk/default.gpj &
+        PIDS="$PIDS $!"
+        $GB -cfg=noapps -top mtk/default.gpj &
+        PIDS="$PIDS $!"
+
+        wait $PIDS
+        PIDS=""
+    fi
+
+    wait $PIDS
+
+    cd $ORIG_DIR
 }
 
 # Handle a report

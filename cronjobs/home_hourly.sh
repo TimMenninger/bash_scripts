@@ -1,19 +1,10 @@
 #!/bin/bash -l
 
-SCRIPTPATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-
 # Main loop
 function main() {
-    build_deps
-    build_tools
     build_nh2017
-    build_bsps
-    clean_things
-    run_pre_commit
     return 0
 }
-
-export CONFIGS_DIR="/configs/nh2017_config"
 
 # Environment stuff
 source ~/.bashrc
@@ -26,8 +17,7 @@ export PROJ_BUILD_TARGETS=(
 
     # MTK build configurations
     "mtk/default.gpj -cfg=timemachine"
-    "mtk/default.gpj -cfg=demo"
-    "mtk/default.gpj -cfg=noapps"
+    "mtk/default.gpj -cfg=release"
 
     # Android vmm
     "bsp/virtualization/default.gpj -cfg=checked -DANDROID"
@@ -38,8 +28,7 @@ export PROJ_OUT_DIRS=(
     "linux64/noapps"
     "linux64/debug"
     "mtk/tm"
-    "mtk/demo"
-    "mtk/noapps"
+    "mtk/rel"
     "bsp/virtualization/chk"
 )
 
@@ -57,37 +46,6 @@ export CHECKOUTS=(
 # Tools directory
 export MY_TOOLS_DIR="/home/willow/tools"
 
-# Takes a number of seconds and outputs Xh Ym Zs
-function format_duration() {
-    DURATION=$1
-
-    HRS=$(($DURATION / 60 / 60))
-    DURATION=$(($DURATION-$(($HRS * 60 * 60))))
-
-    MINS=$(($DURATION / 60))
-    DURATION=$((DURATION-$(($MINS * 60))))
-
-    SECS=$DURATION
-
-    FMT=""
-    if [[ $HRS > "0" ]]
-    then
-        FMT="${FMT}${HRS}h "
-    fi
-
-    if [[ $MINS > "1" ]]
-    then
-        FMT="${FMT}${MINS}m "
-    elif [[ $HRS > "0" ]]
-    then
-        FMT="${FMT}00m "
-    fi
-
-    FMT="${FMT}${SECS}s"
-
-    echo $FMT
-}
-
 # Sets environment variables used here
 function set_env() {
 
@@ -100,42 +58,17 @@ function set_env() {
     return 0
 }
 
-# Some things that are built require third party dependencies
-function build_deps() {
-    # Make sure third party stuff is up to date
-    cd $CONFIGS_DIR/third_party
-    svn up
-    ./build_third_party.sh
-}
-
-# Do some general cleaning to try and keep disk usage down
-function clean_things() {
-    # For one reason or another, there's a bunch of garbage placed here
-    rm -f /tftpboot/bak/*
-
-    # Remove unused images
-    mv $CONFIGS_DIR/images/2700000123 /tmp/
-    rm -rf $CONFIGS_DIR/images/*
-    mv /tmp/2700000123 $CONFIGS_DIR/images/
-}
-
 # Update everything so we build on a clean slate
 function svn_update() {
     CHECKOUT=$1
 
     # Create patch in case we botch things
     /usr/bin/svn cleanup $CHECKOUT
-    if [[ "" == "$(/usr/bin/svn st)" ]]; then
+    if [[ "" == "$(/usr/bin/svn st $CHECKOUT)" ]]; then
         /usr/bin/svn up $CHECKOUT
-        if [[ $? -ne 0 ]]; then
-            echo "Unable to update!"
-            return 1
-        fi
-        for out_dir in "${PROJ_OUT_DIRS}"; do
-            rm -rf $out_dir
-        done
     else
         echo "Existing changes"
+        echo "$(/usr/bin/svn st)"
         return 1
     fi
 
@@ -147,11 +80,6 @@ function svn_update() {
 
     # Success
     return 0
-}
-
-# Build GHS tools
-function build_tools() {
-    MY_TOOLS_DIR=$MY_TOOLS_DIR $SCRIPTPATH/../tools/build_tools.sh
 }
 
 # Build nh2017 stuff
@@ -182,17 +110,12 @@ function build_nh2017() {
         echo "$checkout"
         echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
-        # If there are outstanding changes, don't touch the directory
-        if [[ $(svn st $checkout) ]]; then
-            echo ""
-            echo "Existing changes!"
-            svn st
-            continue
-        fi
+        # Build dependencies
+        build_deps $checkout
 
         # Run the gbuild command in the correct directory
         for target_cfg in "${PROJ_BUILD_TARGETS[@]}"; do
-            /home/aspen/my_compiler_working/linux64-comp/gbuild -cleanfirst -top $checkout/$target_cfg
+            /home/aspen/my_compiler_working/linux64-comp/gbuild -top $checkout/$target_cfg -nice
             END_SECS=$(date +%s)
             END=$(date +%I:%M:%S%p)
         done
@@ -206,32 +129,6 @@ function build_nh2017() {
         echo "Duration: " $(format_duration $DIFF)
         echo ""
     done
-}
-
-function build_bsps() {
-    if [ -d "${NH2017}/../bsp-nh2017" ]; then
-        cd ${NH2017}/../bsp-nh2017
-        /usr/bin/svn up
-        svn cleanup
-    fi
-
-    if [ -d "/home/willow2/mtk/integrity" ]; then
-        cd /home/willow2/mtk/integrity
-        svn up
-        svn cleanup
-    fi
-
-    if [ -d "/home/willow2/mtk" ]; then
-        cd /home/willow2/mtk
-        (cd android; git pull)
-        (cd modem; git pull)
-        /home/willow2/mtk/scripts/build.sh
-    fi
-}
-
-function run_pre_commit() {
-    cd ${NH2017}
-    ./pre_commit.sh
 }
 
 # Time the entire thing

@@ -16,8 +16,8 @@ body = " ".join(sys.argv[2:])
 
 # Your Account Sid and Auth Token from twilio.com/console
 # DANGER! This is insecure. See http://twil.io/secure
-account_sid =
-auth_token =
+account_sid = 'AC3f51b0e1002cf05fdb5d3f96d343e4d6'
+auth_token = 'e0e5719e4629301aa2f9133a964d1fab'
 client = Client(account_sid, auth_token)
 
 message = client.messages \

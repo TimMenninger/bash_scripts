@@ -49,6 +49,27 @@ function color_gbuild() {
 function vpn() {
     sudo vpnc-disconnect
     sudo vpnc-connect ghs
+
+    # Mount directories we care about
+    EXPORTS=(
+        "aspen"
+        "buckeye"
+        "gorgon2"
+        "helios"
+        "mahogany"
+        "manta2"
+        "maple"
+        "multi"
+        "ops"
+        "pine"
+        "pine2"
+        "publications"
+    )
+
+    for e in "${EXPORTS[@]}"; do
+        mkdir -p /home/$e
+        sshfs tmenninger@willow:/home/$e /home/$e
+    done
 }
 
 # Print owners of all changed items

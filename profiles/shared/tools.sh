@@ -54,6 +54,13 @@ function catline()
     return 0
 }
 
+# Create ssh keys
+function ssh_key() {
+    yes "" | ssh-keygen -t rsa -f /keys/${1}-ssh
+    ssh-copy-id -i ~/.ssh/id_rsa.pub tmenninger@$1.ghs.com
+    yes "" | ssh-add
+}
+
 # Move window
 function move() {
 	echo -ne "\e[3;"$1";"$2"t"
@@ -215,5 +222,4 @@ build_ps1() {
 
     export PS1="\${RUNTIME}\n\$(full_bar)\n\W $ "
 }
-
 

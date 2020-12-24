@@ -5,7 +5,7 @@ if [ "$SCRIPTPATH" -eq "" ]; then
     echo "WARNING: SCRIPTPATH variable not set!  This is used to find helper scripts"
 else
     # Make sure scripts are up to date
-    (cd ${SCRIPTPATH}/.. && git pull 2&>1 /dev/null)
+    (cd ${SCRIPTPATH}/.. && git pull &>/dev/null)
 fi
 
 if [ "$BASH_PROFILE" -eq "" ]; then

@@ -4,7 +4,7 @@
 export BASH_PROFILE="/Users/tmenninger/.bash_profile"
 
 # Make sure scripts are up to date
-(cd ${SCRIPTPATH}/.. && git pull 2&>1 /dev/null)
+(cd ${SCRIPTPATH}/.. && git pull &>/dev/null)
 
 # NH2017 stuff
 source ${SCRIPTPATH}/shared/ghs.sh

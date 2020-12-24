@@ -13,7 +13,7 @@ export LD_LIBRARY_PATH="/home/vulcan0/bigtmp/vidstory_tools/libs"
 alias multi_video="/home/vulcan0/bigtmp/trunk/linux64-ide/multi -GHSXHistoryVideo"
 
 # Make sure scripts are up to date
-(cd ${SCRIPTPATH}/.. && git pull 2&>1 /dev/null)
+(cd ${SCRIPTPATH}/.. && git pull &>/dev/null)
 
 # Stuff when we are working for ghs
 source ${SCRIPTPATH}/shared/ghs.sh

@@ -6,7 +6,7 @@ SCRIPTPATH="/home/tmenninger/scripts/profiles"
 export BASH_PROFILE="/home/tmenninger/.bashrc"
 
 # Make sure scripts are up to date
-(cd ${SCRIPTPATH}/.. && git pull 2&>1 /dev/null)
+(cd ${SCRIPTPATH}/.. && git pull &>/dev/null)
 
 # GHS tool stuff but for at home. Must be before ghs_tools, as it sets
 # environment variables

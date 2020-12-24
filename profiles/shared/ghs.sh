@@ -56,6 +56,9 @@ function vpn() {
 
 # Print owners of all changed items
 alias owners="/tools/sitescripts/gcomponent.py -m -o"
+function owner() {
+    /tools/sitescripts/gcomponent.py -o $@
+}
 
 # Mount directory
 function sshfs_ghs() {

@@ -50,6 +50,10 @@ function vpn() {
     sudo vpnc-disconnect
     sudo vpnc-connect ghs
 
+    PIDS=""
+    (cd $NH2017; aw_yis) &
+    PIDS="$PIDS $!"
+
     # Mount directories we care about
     EXPORTS=(
         "aspen"
@@ -68,8 +72,11 @@ function vpn() {
 
     for e in "${EXPORTS[@]}"; do
         mkdir -p /home/$e
-        sshfs tmenninger@willow:/home/$e /home/$e
+        sshfs tmenninger@willow:/home/$e /home/$e &
+        PIDS="$PIDS $!"
     done
+
+    wait $PIDS
 }
 
 # Print owners of all changed items

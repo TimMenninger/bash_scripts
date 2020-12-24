@@ -62,6 +62,32 @@ function sshfs_ghs() {
     sshfs $1:/export /home/$1
 }
 
+# Set sym links for third party directory
+function set_third_party_symlinks() {
+    # relative to third_party
+    SYMLINKS=(
+        "opus/opus-1.2.1"
+        "built/bin"
+        "built/include"
+        "built/lib"
+        "built/share"
+        "libusb"
+        "built_win64/include"
+        "built_win64/lib"
+        "libvpx/libvpx-1.8.1"
+        "libyuv/libyuv"
+        "SDL2/build"
+    )
+
+    if [ ! -d app_table ]; then
+        echo "Not in nh2017 directory"
+    fi
+
+    for s in "${SYMLINKS[@]}"; do
+        (cd third_party; mkdir -p $s; rm -rf $s; ln -sf /configs/nh2017_config/third_party/$s $s)
+    done
+}
+
 
 
 #
@@ -111,6 +137,8 @@ function aw_yis() {
         echo 4
         cd ../../../..
     fi
+
+    set_third_party_symlinks
 
     GB=/compiler/gbuild
     PIDS=""
@@ -319,9 +347,9 @@ function update_tools() {
 
     (cd /tools; svn up)
     (cd /tools; ./bin/scripts/cvlink update)
-    (cd /tools/linux64-comp && ../dobuild arm64_compiler_val.all linux86_compiler_val.all ghprobe_comp.all osa_linux_kernel.all internal_tools_comp.all)
-    (cd /tools/linux64-ide && ../dobuild everything_ide.all)
-    (cd /tools/trg && ./build_lib -fixbuildlinks -arm64 ; ./build_lib -fixbuildlinks -intarm64 ; ./build_lib -fixbuildlinks -linux86)
+    (cd /tools/linux64-comp && ../dobuild arm64_compiler_val.all linux86_compiler_val.all ghprobe_comp.all osa_linux_kernel.all internal_tools_comp.all -blind)
+    (cd /tools/linux64-ide && ../dobuild everything_ide.all -blind)
+    (cd /tools/trg && ./build_lib -fixbuildlinks -arm64 -blind; ./build_lib -fixbuildlinks -intarm64 -blind; ./build_lib -fixbuildlinks -linux86 -blind)
 }
 
 function update_rtos() {

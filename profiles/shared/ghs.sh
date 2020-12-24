@@ -23,7 +23,8 @@ export MULTI_DIR="/multi"
 export GHSCOMP_DIR="/compiler"
 export TOOLS_DIR="/tools"
 export RTOS_DIR="/rtos/rtos"
-export PATH=$TOOLS_DIR/sitescripts:$PATH
+
+export PATH=$MULTI_DIR:$GHSCOMP_DIR:$TOOLS_DIR/sitescripts:$PATH
 
 # Required for multi
 export GHS_LMHOST="#ghslm1,ghslm2,ghslm3"

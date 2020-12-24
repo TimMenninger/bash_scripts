@@ -18,6 +18,8 @@ if [ -z $NH2017 ]; then
     export NH2017="/phone"
 fi
 
+SVN="/usr/bin/svn"
+
 # GHS tools
 export MULTI_DIR="/multi"
 export GHSCOMP_DIR="/compiler"
@@ -261,16 +263,16 @@ function hr() {
         /compiler/gbuild -clean -top $DEBUG_NH2017/linux64/default.gpj -allcfg
 
         # Cleanup
-        svn cleanup $DEBUG_NH2017
+        $SVN cleanup $DEBUG_NH2017
 
         # Revert existing changes
-        svn revert -R $DEBUG_NH2017
+        $SVN revert -R $DEBUG_NH2017
 
         # Go to correct revision
-        svn up -r$(cat $REPORT_PATH/rev) $DEBUG_NH2017
+        $SVN up -r$(cat $REPORT_PATH/rev) $DEBUG_NH2017
 
         # Apply necessary patch
-        svn patch $REPORT_PATH/patch $DEBUG_NH2017
+        $SVN patch $REPORT_PATH/patch $DEBUG_NH2017
     fi
 
     if $REBUILD; then
@@ -373,11 +375,11 @@ function update_tools() {
         return 1
     fi
 
-    (cd /tools; svn up)
+    (cd /tools; $SVN up)
     (cd /tools; ./bin/scripts/cvlink update)
-    (cd /tools/linux64-comp && ../dobuild arm64_compiler_val.all linux86_compiler_val.all ghprobe_comp.all osa_linux_kernel.all internal_tools_comp.all -blind)
-    (cd /tools/linux64-ide && ../dobuild everything_ide.all -blind)
-    (cd /tools/trg && ./build_lib -fixbuildlinks -arm64 -blind; ./build_lib -fixbuildlinks -intarm64 -blind; ./build_lib -fixbuildlinks -linux86 -blind)
+    (cd /tools/linux64-comp && ../dobuild arm64_compiler_val.all linux86_compiler_val.all ghprobe_comp.all osa_linux_kernel.all internal_tools_comp.all)
+    (cd /tools/linux64-ide && ../dobuild everything_ide.all)
+    (cd /tools/trg && ./build_lib -fixbuildlinks -arm64; ./build_lib -fixbuildlinks -intarm64 -blind; ./build_lib -fixbuildlinks -linux86)
 }
 
 function update_rtos() {
@@ -386,7 +388,7 @@ function update_rtos() {
         return 1
     fi
 
-    (cd /rtos; svn up)
+    (cd /rtos; $SVN up)
     (cd /rtos; ./setup.py)
     (cd /rtos/rtos/hoyos-sm835; ./setup.sh)
 }
@@ -401,8 +403,8 @@ if [ -d "/t/toolsvc/trunk/users/" ]; then
     # Whenever I check out a VM that has a tool checkout, start checking out my
     # users folder as soon as the vm starts up.
     cd /t/toolsvc/trunk/users
-    svn up `whoami`
-    svn up nh2017
+    $SVN up `whoami`
+    $SVN up nh2017
 
     # Copy vimrc file
     cp /home/eng/users/tmenninger/.vimrc ~/.vimrc

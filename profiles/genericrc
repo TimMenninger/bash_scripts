@@ -15,14 +15,8 @@ fi
 # SVN related tools
 source ${SCRIPTPATH}/shared/svn.sh
 
-# Standardize version control stuff
-source ${SCRIPTPATH}/shared/vc.sh
-
 # Common tools
 source ${SCRIPTPATH}/shared/tools.sh
-
-# Terminal stuff
-source ${SCRIPTPATH}/shared/terminal.sh
 
 # Copy vim bundles to accessible directory
 source ${SCRIPTPATH}/shared/vim_bundles.sh

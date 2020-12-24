@@ -1,29 +1,78 @@
 #!/bin/bash -l
 
-alias nh2017="cd $NH2017"
+#
+# A N D R O I D
+#
 
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/willow2/mtk/SP_Flash_Tool_v5.1828_Linux/:/home/willow2/mtk/SP_Flash_Tool_v5.1828_Linux/lib
+
+export PATH=/home/willow2/mtk/android/out/host/linux-x86/bin:$PATH
+
+
+
+#
+# G H S   T O O L S
+#
+
+if [ -z $NH2017 ]; then
+    export NH2017="/phone"
+fi
+
+# GHS tools
+export MULTI_DIR="/multi"
+export GHSCOMP_DIR="/compiler"
+export TOOLS_DIR="/tools"
+export RTOS_DIR="/rtos/rtos"
+export PATH=$TOOLS_DIR/sitescripts:$PATH
+
+# Required for multi
+export GHS_LMHOST="#ghslm1,ghslm2,ghslm3"
+export GHS_LMWHICH="ghs"
+
+# Required for multi
+export GHS_ALLOW_LOCAL_LICENSE=1
+export LICENSE_FILE_DIR=/home/willow/license/
+
+# Bash history tweaks
+export HISTTIMEFORMAT=
+
+# Special gbuild thanks to Ian
+alias gb="color_gbuild"
+alias gbuild="color_gbuild"
+export GBUILD="$GHSCOMP_DIR/gbuild $1"
+function color_gbuild() {
+    date
+
+    command $GBUILD "$@" |& awk -f $NH2017/scripts/gbuild.awk
+
+    return ${PIPESTATUS[0]}
+}
+
+# Connect to vpn
+function vpn() {
+    sudo vpnc-disconnect
+    sudo vpnc-connect ghs
+}
+
+# Print owners of all changed items
+alias owners="/tools/sitescripts/gcomponent.py -m -o"
+
+# Mount directory
+function sshfs_ghs() {
+    sshfs $1:/export /home/$1
+}
+
+
+
+#
+# N H 2 0 1 7
+#
+
+# Pytest lives here
 export PATH=$HOME/.local/bin:$PATH
 
-export TEST_RCAR_ADDRESS='adunlap1'
-
-# Other nh2017 checkouts
-DEBUG_NH2017=$NH2017/../debug-nh2017
-
-function get_flanders() {
-    TEST_NUM=$1
-    if [ -z TEST_NUM ]; then
-        echo "Need test number as only argument"
-        return
-    fi
-    (
-    rm $TARBALL_NAME.tar.gz*
-    cd /home/willow/replays
-    TARBALL_NAME=commit_full_replay
-    wget flanders.ghs.com/job/Phone/${TEST_NUM}/artifact/$TARBALL_NAME.tar.gz
-    tar -zvxf $TARBALL_NAME.tar.gz
-    rm $TARBALL_NAME.tar.gz
-    )
-}
+# NH2017 directories
+alias nh2017="cd $NH2017"
 
 alias nh1='nh 1'
 alias nh2='nh 2'
@@ -42,6 +91,7 @@ function nh() {
     fi
 }
 
+# Clean
 function aw_yis() {
     ORIG_DIR="$(pwd)"
 
@@ -62,11 +112,9 @@ function aw_yis() {
         cd ../../../..
     fi
 
-    GB=/home/aspen/my_compiler_working/linux64-comp/gbuild
+    GB=/compiler/gbuild
     PIDS=""
     if [[ "$(basename $(pwd))" == *"nh2017"* ]]; then
-        rm linux64/debug linux64/noapps mtk/tm mtk/rel mtk/noapps endpoints/debug endpoints/linux64
-
         # All linux can happen in parallel
         #
         # MTK Timemachine and noapps must happen in series, can be parallel with
@@ -74,28 +122,32 @@ function aw_yis() {
         #
         # Sequence here caters to likelihood of using it to get those done soon.
         # Not looking necessarily for fastest solution to get all done
-        $GB -cfg=debug -top linux64/default.gpj &
+        (cd mtk; ../scripts/remove_nonoutput.py -cfg=hicdebug; $GB -cfg=hicdebug) &
+        MTK_PID="$!"
+
+        (cd linux64; ../scripts/remove_nonoutput.py -cfg=hicdebug; $GB -cfg=hicdebug) &
         PIDS="$PIDS $!"
-        $GB -cfg=timemachine -top mtk/default.gpj &
+        (cd linux64; ../scripts/remove_nonoutput.py -cfg=nextdebug; $GB -cfg=nextdebug) &
         PIDS="$PIDS $!"
-        $GB -top endpoints/default.gpj &
+        (cd endpoints; ../scripts/remove_nonoutput.py -cfg=debug; $GB -cfg=debug) &
+        PIDS="$PIDS $!"
+        (cd endpoints; ../scripts/remove_nonoutput.py -cfg=release; $GB -cfg=release) &
         PIDS="$PIDS $!"
 
-        wait $PIDS
-        PIDS=""
+        wait $MTK_PID
 
-        $GB -cfg=noapps -top linux64/default.gpj &
+        (cd mtk/bootmonitor; ../../scripts/remove_nonoutput.py; $GB) &
         PIDS="$PIDS $!"
-        $GB -cfg=release -top mtk/default.gpj &
+        (cd mtk; ../scripts/remove_nonoutput.py -cfg=nextdebug; $GB -cfg=nextdebug) &
         PIDS="$PIDS $!"
-        $GB -cfg=noapps -top mtk/default.gpj &
+        (cd mtk; ../scripts/remove_nonoutput.py -cfg=p1replay; $GB -cfg=nextdebug) &
+        PIDS="$PIDS $!"
+        (cd mtk; ../scripts/remove_nonoutput.py -cfg=p1release; $GB -cfg=nextdebug) &
         PIDS="$PIDS $!"
 
         wait $PIDS
         PIDS=""
     fi
-
-    wait $PIDS
 
     cd $ORIG_DIR
 }
@@ -150,7 +202,7 @@ function hr() {
     # Gbuild clean with existing changes so we don't delete something that
     # causes us to keep a stale binary
     if $REVERT; then
-        /home/aspen/my_compiler_working/linux64-comp/gbuild -clean -top $DEBUG_NH2017/linux64/default.gpj -allcfg
+        /compiler/gbuild -clean -top $DEBUG_NH2017/linux64/default.gpj -allcfg
 
         # Cleanup
         svn cleanup $DEBUG_NH2017
@@ -167,34 +219,11 @@ function hr() {
 
     if $REBUILD; then
         # Build linux
-        /home/aspen/my_compiler_working/linux64-comp/gbuild -top $DEBUG_NH2017/linux64/default.gpj $CFG
+        /compiler/gbuild -top $DEBUG_NH2017/linux64/default.gpj $CFG
     fi
 
     # Handle the report
     $DEBUG_NH2017/linux64/handle_report $REPORT_PATH
-
-}
-
-# Pre commit for linux only
-function pcl() {
-    nh2017
-    cd linux64
-    gb
-    cd ..
-    pytest -m 'linux and pre_commit' tests -P2735700001
-}
-
-# Debug the test phone number
-function dbpc() {
-    nh2017
-    cd linux64
-    ./rdebug 2735700001 $1
-}
-
-# Pre commit
-function pc() {
-    nh2017
-    ./pre_commit.sh
 }
 
 function make_phone_num() {
@@ -211,9 +240,11 @@ function clean_email() {
 
 function run() {
     # Go to correct directory
-    nh2017
     if [[ ! -d "linux64" ]]; then
-        return 1
+        if [[ ! -d "../linux64" ]]; then
+            return 1
+        fi
+        cd ..
     fi
     cd linux64
 
@@ -228,7 +259,7 @@ function run() {
         -XAllowAnyNumber
         -Xautologin
         -Xdisplay_borderless
-        -Xdisplay_always_on_top
+        -Zlicense_manager_on
     "
 
     # Processes to show output for
@@ -247,12 +278,6 @@ function run() {
             --gk)
                 X_SWITCHES+=" -XGuikitNoisy "
                 SHOW_OUTPUT+="GUIKIT,"
-                ;;
-            --uc)
-                SHOW_OUTPUT+="UBERCOMM,"
-                ;;
-            --cm)
-                SHOW_OUTPUT+="CONTACT_MANAGER,"
                 ;;
             --sv)
                 SHOW_OUTPUT+="SUPERVISOR,"
@@ -286,110 +311,44 @@ function run() {
     ./run $PHONE_NUM -show-output:$SHOW_OUTPUT $X_SWITCHES $DEBUG ${@:2}
 }
 
-function update_iot_partitions() {
-    # go to IoT directory
-    nh2017
-    cd iot
-
-    # build IoT and, if successful, flash images
-    gb && cd bootloader; sudo ./flash_images.sh $IOT_PROBE
-}
-
-reset_pipe_buffers() {
-    sudo sysctl fs.pipe-max-size=16777216
-    sudo sysctl -w fs.pipe-user-pages-soft=0
-}
-
-# Runs the pytest tests
-function nhtest() {
-    OPTIONS=""
-    DIRECTORY="tests"
-    POSITIONAL=()
-    while [[ $# -gt 0 ]]; do
-        arg=$1
-        case $arg in
-            --keyboard)
-                DIRECTORY="tests/keyboard"
-                ;;
-            --verbose)
-                OPTIONS+=" -s"
-                ;;
-            --linux)
-                OPTIONS+=" -m linux"
-                ;;
-            --display)
-                OPTIONS+=" --display_linux"
-                ;;
-            *)
-                POSITIONAL+=("$arg")
-                ;;
-        esac
-        shift # past argument
-    done
-
-    (cd $NH2017;pytest $OPTIONS $DIRECTORY)
-}
-alias kb_test_linux='(nh2017;nhtest --linux --keyboard --verbose --display)'
-
-# Building and updating nh2017
-function build_then_run() {
-    cd $NH2017
-    cd linux64
-
-    gbuild
-    if [ $? -eq 0 ];
-    then
-        ./run $@
-    fi
-}
-
-# Run N instances of phone
-function runN() {
-    nh2017
-    gbuild
-    if [ $? -eq 0 ];
-    then
-        counter=$1
-        bound=$2
-        if [ -z $bound ]
-        then
-            bound=0
-        fi
-        re='^[0-9]+$'
-        if [[ $counter =~ $re ]]
-        then
-            while [ $counter -ge $bound ]
-            do
-                run $counter &
-                ((counter--))
-                sleep 1
-            done
-        fi
-    fi
-}
-
-function grep_nh() {
-    DIR="$NH2017/src $NH2017/libs $NH2017/app_table $NH2017/linux64/debug/gen/app_table/*.h $NH2017/linux64/debug/gen/app_table/*.c $NH2017/linux64/debug/work/*.h $NH2017/linux64/debug/work/*.c $NH2017/linux64/debug/work/*.genlayout $NH2017/linux64/default.gpj $NH2017/rcar_dynamic/hist/gen/app_table/*.h $NH2017/rcar_dynamic/hist/gen/app_table/*.c $NH2017/rcar_dynamic/hist/work/*.h $NH2017/rcar_dynamic/hist/work/*.c $NH2017/rcar_dynamic/hist/work/*.genlayout $NH2017/rcar_dynamic/default.gpj $NH2017/iot/tm/gen/app_table/*.h $NH2017/iot/tm/gen/app_table/*.c $NH2017/iot/tm/work/*.h $NH2017/iot/tm/work/*.c $NH2017/iot/tm/work/*.genlayout $NH2017/iot/default.gpj"
-    if [[ ! -z "$2" ]]; then
-        DIR=$2
+function update_tools() {
+    if [ ! -d /tools ]; then
+        echo "Nothing at /tools"
+        return 1
     fi
 
-    echo "grep -r -I -n $1 $DIR/"
-    grep -r -I -n "$1" $DIR
+    (cd /tools; svn up)
+    (cd /tools; ./bin/scripts/cvlink update)
+    (cd /tools/linux64-comp && ../dobuild arm64_compiler_val.all linux86_compiler_val.all ghprobe_comp.all osa_linux_kernel.all internal_tools_comp.all)
+    (cd /tools/linux64-ide && ../dobuild everything_ide.all)
+    (cd /tools/trg && ./build_lib -fixbuildlinks -arm64 ; ./build_lib -fixbuildlinks -intarm64 ; ./build_lib -fixbuildlinks -linux86)
 }
 
-# Replay
-function rp() {
-	if [ $# -eq 2 ]
-	then
-        (
-        nh2017;
-		cd linux64/images/$1;
-        ./rdebug $2;
-        )
-	else
-		echo "usage: rp [number] [process]"
-	fi
+function update_rtos() {
+    if [ ! -d /rtos ]; then
+        echo "Nothing at /rtos"
+        return 1
+    fi
+
+    (cd /rtos; svn up)
+    (cd /rtos; ./setup.py)
+    (cd /rtos/rtos/hoyos-sm835; ./setup.sh)
 }
 
+
+
+#
+# T I C K E T S
+#
+
+if [ -d "/t/toolsvc/trunk/users/" ]; then
+    # Whenever I check out a VM that has a tool checkout, start checking out my
+    # users folder as soon as the vm starts up.
+    cd /t/toolsvc/trunk/users
+    svn up `whoami`
+    svn up nh2017
+
+    # Copy vimrc file
+    cp /home/eng/users/tmenninger/.vimrc ~/.vimrc
+fi
 

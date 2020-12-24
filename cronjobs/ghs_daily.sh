@@ -1,15 +1,24 @@
 #!/bin/bash -l
 
-SCRIPTPATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+SCRIPTPATH="$( cd "$(dirname "$0")" >/dev/null ; pwd -P )"
 
 # Main loop
 function main() {
+    update_tools
+    update_rtos
+
     build_deps
-    build_tools
-    build_nh2017
-    build_bsps
-    clean_things
-    run_pre_commit
+
+    PIDS=""
+    build_nh2017 &
+    PIDS="$PIDS $!"
+    build_bsps &
+    PIDS="$PIDS $!"
+    clean_things &
+    PIDS="$PIDS $!"
+
+    wait $PIDS
+
     return 0
 }
 
@@ -17,21 +26,6 @@ export CONFIGS_DIR="/configs/nh2017_config"
 
 # Environment stuff
 source ~/.bashrc
-
-# List of all directories to cd into for gbuild, absolute
-export PROJ_BUILD_TARGETS=(
-    # Linux build configurations
-    "linux64/default.gpj -cfg=debug"
-    "linux64/default.gpj -cfg=noapps"
-
-    # MTK build configurations
-    "mtk/default.gpj -cfg=timemachine"
-    "mtk/default.gpj -cfg=demo"
-    "mtk/default.gpj -cfg=noapps"
-
-    # Android vmm
-    "bsp/virtualization/default.gpj -cfg=checked -DANDROID"
-)
 
 # List of all directories to remove as part of cleaning
 export PROJ_OUT_DIRS=(
@@ -119,41 +113,6 @@ function clean_things() {
     mv /tmp/2700000123 $CONFIGS_DIR/images/
 }
 
-# Update everything so we build on a clean slate
-function svn_update() {
-    CHECKOUT=$1
-
-    # Create patch in case we botch things
-    /usr/bin/svn cleanup $CHECKOUT
-    if [[ "" == "$(/usr/bin/svn st)" ]]; then
-        /usr/bin/svn up $CHECKOUT
-        if [[ $? -ne 0 ]]; then
-            echo "Unable to update!"
-            return 1
-        fi
-        for out_dir in "${PROJ_OUT_DIRS}"; do
-            rm -rf $out_dir
-        done
-    else
-        echo "Existing changes"
-        return 1
-    fi
-
-    # Update and only continue on success (might be merge conflicts or whatever)
-    if [[ $? -ne 0 ]]; then
-        echo "Unable to update!"
-        return 1
-    fi
-
-    # Success
-    return 0
-}
-
-# Build GHS tools
-function build_tools() {
-    MY_TOOLS_DIR=$MY_TOOLS_DIR $SCRIPTPATH/../tools/build_tools.sh
-}
-
 # Build nh2017 stuff
 function build_nh2017() {
     # Remove extraneous images
@@ -169,9 +128,6 @@ function build_nh2017() {
         if [ ! -d $checkout ]; then
             continue
         fi
-
-        # Update the repo
-        svn_update $checkout; if [[ $? -ne 0 ]]; then continue; fi
 
         # Time the command
         START_SECS=$(date +%s)
@@ -190,12 +146,12 @@ function build_nh2017() {
             continue
         fi
 
+        # Update the repo
+        svn cleanup $checkout
+        svn update $checkout
+
         # Run the gbuild command in the correct directory
-        for target_cfg in "${PROJ_BUILD_TARGETS[@]}"; do
-            /home/aspen/my_compiler_working/linux64-comp/gbuild -cleanfirst -top $checkout/$target_cfg
-            END_SECS=$(date +%s)
-            END=$(date +%I:%M:%S%p)
-        done
+        (cd $checkout; aw_yis)
 
         DIFF=$(( $END_SECS - $START_SECS ))
 
@@ -214,24 +170,6 @@ function build_bsps() {
         /usr/bin/svn up
         svn cleanup
     fi
-
-    if [ -d "/home/willow2/mtk/integrity" ]; then
-        cd /home/willow2/mtk/integrity
-        svn up
-        svn cleanup
-    fi
-
-    if [ -d "/home/willow2/mtk" ]; then
-        cd /home/willow2/mtk
-        (cd android; git pull)
-        (cd modem; git pull)
-        /home/willow2/mtk/scripts/build.sh
-    fi
-}
-
-function run_pre_commit() {
-    cd ${NH2017}
-    ./pre_commit.sh
 }
 
 # Time the entire thing

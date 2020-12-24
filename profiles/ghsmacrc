@@ -1,14 +1,5 @@
 #!/bin/bash -l
 
-# Absolute path this script is in, thus /home/user/bin
-export SCRIPTPATH="/Users/tmenninger/scripts/profiles"
-
-# No Zonedin directory
-export ZONEDIN=".; echo \"No zoned in\""
-
-# NH2017 directory
-export NH2017="/Users/tmenninger/Documents/nh2017"
-
 # Bash profile
 export BASH_PROFILE="/Users/tmenninger/.bash_profile"
 
@@ -16,18 +7,14 @@ export BASH_PROFILE="/Users/tmenninger/.bash_profile"
 (cd ${SCRIPTPATH}/.. && git pull 2&>1 /dev/null)
 
 # NH2017 stuff
-source ${SCRIPTPATH}/shared/nh2017.sh
+source ${SCRIPTPATH}/shared/ghs.sh
 
 # SVN related tools
 source ${SCRIPTPATH}/shared/svn.sh
-
-# Standardize version control stuff
-source ${SCRIPTPATH}/shared/vc.sh
 
 # Common tools
 source ${SCRIPTPATH}/shared/tools.sh
 
 # Copy vim bundles to accessible directory
 source ${SCRIPTPATH}/shared/vim_bundles.sh
-
 

@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python3.6
 # Download the helper library from https://www.twilio.com/docs/python/install
 from twilio.rest import Client
 

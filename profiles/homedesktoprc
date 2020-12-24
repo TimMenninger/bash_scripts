@@ -2,40 +2,18 @@
 
 SCRIPTPATH="/home/tmenninger/scripts/profiles"
 
-# Zonedin directory
-export ZONEDIN="/home/tmenninger/zonedin"
-
-# NH2017 directory
-export NH2017="/home/willow/nh2017"
-
 # Bash profile
 export BASH_PROFILE="/home/tmenninger/.bashrc"
 
 # Make sure scripts are up to date
 (cd ${SCRIPTPATH}/.. && git pull 2&>1 /dev/null)
 
-# Monitors
-source ${SCRIPTPATH}/shared/home_desktop_monitors.sh
-
 # GHS tool stuff but for at home. Must be before ghs_tools, as it sets
 # environment variables
-source ${SCRIPTPATH}/shared/ghs_wfh.sh
-
-# Stuff relating to GHS tool
-source ${SCRIPTPATH}/shared/ghs_tools.sh
-source ${SCRIPTPATH}/shared/ghs_given.sh
-
-# Android stuff
-source ${SCRIPTPATH}/shared/android.sh
-
-# NH2017 stuff
-source ${SCRIPTPATH}/shared/nh2017.sh
+source ${SCRIPTPATH}/shared/ghs.sh
 
 # SVN related tools
 source ${SCRIPTPATH}/shared/svn.sh
-
-# Standardize version control stuff
-source ${SCRIPTPATH}/shared/vc.sh
 
 # Common tools
 source ${SCRIPTPATH}/shared/tools.sh
@@ -44,14 +22,6 @@ source ${SCRIPTPATH}/shared/tools.sh
 source ${SCRIPTPATH}/shared/n64.sh
 source ${SCRIPTPATH}/shared/ps2.sh
 
-# Tools for home desktop
-source ${SCRIPTPATH}/shared/home_tools.sh
-
-# ModelSim
-export PATH=$PATH:/home/tmenninger/intelFPGA/16.1/modelsim_ase/linuxaloem
-
 # Copy vim bundles to accessible directory
 source ${SCRIPTPATH}/shared/vim_bundles.sh
 
-# UCSB
-source ${SCRIPTPATH}/shared/ucsb.sh

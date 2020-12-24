@@ -12,26 +12,15 @@ export BASH_PROFILE="/opt/home/tmenninger/.bashrc"
 (cd ${SCRIPTPATH}/.. && git pull 2&>1 /dev/null)
 
 # Stuff when we are on GHS network
-source ${SCRIPTPATH}/shared/ghs_network.sh
+source ${SCRIPTPATH}/shared/ghs.sh
 GHSCOMP_DIR="/t/toolsvc/trunk/linux64-comp"
-
-# Stuff relating to GHS tool
-source ${SCRIPTPATH}/shared/ghs_tools.sh -DIN_VM
-source ${SCRIPTPATH}/shared/ghs_given.sh
-
-# Android stuff
-source ${SCRIPTPATH}/shared/android.sh
-
-# NH2017 stuff
-source ${SCRIPTPATH}/shared/nh2017.sh
 
 # SVN related tools
 source ${SCRIPTPATH}/shared/svn.sh
 
-# Standardize version control stuff
-source ${SCRIPTPATH}/shared/vc.sh
-
 # Common tools
 source ${SCRIPTPATH}/shared/tools.sh
 
+# Copy vim bundles to accessible directory
+source ${SCRIPTPATH}/shared/vim_bundles.sh
 

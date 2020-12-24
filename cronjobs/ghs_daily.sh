@@ -2,6 +2,8 @@
 
 SCRIPTPATH="$( cd "$(dirname "$0")" >/dev/null ; pwd -P )"
 
+SVN="/usr/bin/svn"
+
 # Main loop
 function main() {
     update_tools
@@ -100,7 +102,7 @@ function set_env() {
 function build_deps() {
     # Make sure third party stuff is up to date
     cd $CONFIGS_DIR/third_party
-    svn up
+    $SVN up
     ./build_third_party.sh
 }
 
@@ -124,7 +126,7 @@ function update_users() {
     )
 
     for u in "${USERS[@]}"; do
-        (cd /users/$u; svn cleanup; svn up)
+        (cd /users/$u; $SVN cleanup; $SVN up)
     done
 }
 
@@ -154,16 +156,16 @@ function build_nh2017() {
         echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
         # If there are outstanding changes, don't touch the directory
-        if [[ $(svn st $checkout) ]]; then
+        if [[ $($SVN st $checkout) ]]; then
             echo ""
             echo "Existing changes!"
-            svn st
+            $SVN st
             continue
         fi
 
         # Update the repo
-        svn cleanup $checkout
-        svn update $checkout
+        $SVN cleanup $checkout
+        $SVN update $checkout
 
         # Run the gbuild command in the correct directory
         (cd $checkout; aw_yis)
@@ -182,8 +184,8 @@ function build_nh2017() {
 function build_bsps() {
     if [ -d "${NH2017}/../bsp-nh2017" ]; then
         cd ${NH2017}/../bsp-nh2017
-        /usr/bin/svn up
-        svn cleanup
+        $SVN up
+        $SVN cleanup
     fi
 }
 

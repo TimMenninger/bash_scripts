@@ -8,6 +8,10 @@ export BASH_PROFILE="/home/tmenninger/.bashrc"
 # Make sure scripts are up to date
 (cd ${SCRIPTPATH}/.. && git pull &>/dev/null)
 
+# Required for multi
+export GHS_ALLOW_LOCAL_LICENSE=1
+export LICENSE_FILE_DIR=/home/willow/license/
+
 # GHS tool stuff but for at home. Must be before ghs_tools, as it sets
 # environment variables
 source ${SCRIPTPATH}/shared/ghs.sh

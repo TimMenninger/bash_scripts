@@ -10,6 +10,8 @@ function main() {
     build_deps
 
     PIDS=""
+    update_users &
+    PIDS="$PIDS $!"
     build_nh2017 &
     PIDS="$PIDS $!"
     build_bsps &
@@ -111,6 +113,19 @@ function clean_things() {
     mv $CONFIGS_DIR/images/2700000123 /tmp/
     rm -rf $CONFIGS_DIR/images/*
     mv /tmp/2700000123 $CONFIGS_DIR/images/
+}
+
+# Update user checkouts
+function update_users() {
+    export USERS=(
+        "tmenninger"
+        "nikola"
+        "ndf_scripts"
+    )
+
+    for u in "${USERS[@]}"; do
+        (cd /users/$u; svn cleanup; svn up)
+    done
 }
 
 # Build nh2017 stuff

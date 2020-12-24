@@ -30,10 +30,6 @@ export PATH=$MULTI_DIR:$GHSCOMP_DIR:$TOOLS_DIR/sitescripts:$PATH
 export GHS_LMHOST="#ghslm1,ghslm2,ghslm3"
 export GHS_LMWHICH="ghs"
 
-# Required for multi
-export GHS_ALLOW_LOCAL_LICENSE=1
-export LICENSE_FILE_DIR=/home/willow/license/
-
 # Bash history tweaks
 export HISTTIMEFORMAT=
 

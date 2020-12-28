@@ -15,7 +15,10 @@ export PATH=/home/willow2/mtk/android/out/host/linux-x86/bin:$PATH
 #
 
 if [ -z $NH2017 ]; then
-    export NH2017="/phone"
+    export NH2017="/home/willow/nh2017"
+    if [ ! -d $NH2017 ]; then
+        export NH2017="/phone"
+    fi
 fi
 
 SVN="/usr/bin/svn"

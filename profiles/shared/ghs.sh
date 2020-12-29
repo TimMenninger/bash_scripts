@@ -122,6 +122,13 @@ function set_third_party_symlinks() {
 }
 
 
+#
+# W I L L O W
+#
+
+alias willow="tmenninger@willow"
+
+
 
 #
 # N H 2 0 1 7

@@ -27,6 +27,7 @@ function main() {
 }
 
 export CONFIGS_DIR="/configs/nh2017_config"
+export WILLOW_DIR="/home/willow"
 
 # Environment stuff
 source ~/.bashrc
@@ -43,13 +44,13 @@ export PROJ_OUT_DIRS=(
 
 export CHECKOUTS=(
     # Normal checkout
-    $NH2017
+    $WILLOW_DIR/nh2017
 
     # Used for replays/debugging
-    $DEBUG_NH2017
+    $WILLOW_DIR/debug-nh2017
 
     # Other checkouts
-    $NH2017/../_nh2017_{1..3}
+    $WILLOW_DIR/_nh2017_{1..3}
 )
 
 # Tools directory
@@ -182,8 +183,8 @@ function build_nh2017() {
 }
 
 function build_bsps() {
-    if [ -d "${NH2017}/../bsp-nh2017" ]; then
-        cd ${NH2017}/../bsp-nh2017
+    if [ -d "$WILLOW_DIR/bsp-nh2017" ]; then
+        cd $WILLOW_DIR/bsp-nh2017
         $SVN up
         $SVN cleanup
     fi

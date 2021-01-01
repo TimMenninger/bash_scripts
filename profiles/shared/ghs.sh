@@ -73,6 +73,9 @@ function vpn() {
         "pine"
         "pine2"
         "publications"
+        "vesta"
+        "vesta2"
+        "vesta3"
     )
 
     for e in "${EXPORTS[@]}"; do

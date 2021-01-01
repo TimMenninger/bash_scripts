@@ -171,6 +171,10 @@ function build_nh2017() {
         # Run the gbuild command in the correct directory
         (cd $checkout; aw_yis)
 
+        # Done timing
+        END_SECS=$(date +%s)
+        END=$(date +%I:%M:%S%p)
+
         DIFF=$(( $END_SECS - $START_SECS ))
 
         # Print out the time

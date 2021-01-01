@@ -110,6 +110,8 @@ function set_third_party_symlinks() {
         "libvpx/libvpx-1.8.1"
         "libyuv/libyuv"
         "SDL2/build"
+        "protobuf-3.4.1"
+        "protobuf-cpp-3.4.1.tar.gz"
     )
 
     if [ ! -d app_table ]; then

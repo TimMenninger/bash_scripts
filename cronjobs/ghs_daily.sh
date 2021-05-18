@@ -104,6 +104,7 @@ function build_deps() {
     # Make sure third party stuff is up to date
     cd $CONFIGS_DIR/third_party
     $SVN up
+    ./get_all.sh
     ./build_third_party.sh
 }
 

@@ -221,7 +221,7 @@ build_ps1() {
     # Print a bar the width of the command prompt
     FULL_BAR=$(printf '%*s' $(($COLUMNS-12)) | tr ' ' -;printf '  %s' $(date +"%H:%M:%S"))
 
-    export PS1="\${RUNTIME}\n\${FULL_BAR}\n\W $ "
+    export PS1="\${RUNTIME}\n\${FULL_BAR}\n$(whoami):\W $ "
 }
 
 function abspath {

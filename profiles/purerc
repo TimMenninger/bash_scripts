@@ -3,10 +3,10 @@
 SCRIPTS_PATH="${HOME}/scripts"
 
 # Bash profile
-export BASH_PROFILE="${HOME}/.bash_profile"
+export BASH_PROFILE="${HOME}/.bashrc"
 
 # Make sure scripts are up to date
-(cd ${SCRIPTS_PATH}/.. && git pull &>/dev/null)
+(cd ${SCRIPTS_PATH} && git pull &>/dev/null)
 
 # Pure Storage stuff
 source ${SCRIPTS_PATH}/profiles/shared/pure.sh

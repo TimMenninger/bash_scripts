@@ -14,12 +14,7 @@ export PATH=/home/willow2/mtk/android/out/host/linux-x86/bin:$PATH
 # G H S   T O O L S
 #
 
-if [ -z $NH2017 ]; then
-    export NH2017="/home/willow/nh2017"
-    if [ ! -d $NH2017 ]; then
-        export NH2017="/phone"
-    fi
-fi
+export NH2017="/home/willow/nh2017"
 
 SVN="/usr/bin/svn"
 
@@ -30,6 +25,9 @@ export TOOLS_DIR="/tools"
 export RTOS_DIR="/rtos/rtos"
 
 export PATH=$MULTI_DIR:$GHSCOMP_DIR:$TOOLS_DIR/sitescripts:$PATH
+
+# Phone project
+export H1U_098_SN="UG9S8D7DJV4DR4VG"
 
 # Required for multi
 export GHS_LMHOST="#ghslm1,ghslm2,ghslm3"
@@ -45,57 +43,19 @@ export GBUILD="$GHSCOMP_DIR/gbuild $1"
 function color_gbuild() {
     date
 
+    if [[ "$#" > 0 ]]; then
+        set -- "-top" "$1/default.gpj" "${@:2}"
+    fi
+
     command $GBUILD "$@" |& awk -f $NH2017/scripts/gbuild.awk
 
     return ${PIPESTATUS[0]}
-}
-
-# Connect to vpn
-function vpn() {
-    sudo vpnc-disconnect
-    sudo vpnc-connect ghs
-
-    PIDS=""
-    (cd $NH2017; aw_yis) &
-    PIDS="$PIDS $!"
-
-    # Mount directories we care about
-    EXPORTS=(
-        "aspen"
-        "buckeye"
-        "gorgon2"
-        "helios"
-        "mahogany"
-        "manta2"
-        "maple"
-        "multi"
-        "ops"
-        "pine"
-        "pine2"
-        "publications"
-        "vesta"
-        "vesta2"
-        "vesta3"
-    )
-
-    for e in "${EXPORTS[@]}"; do
-        mkdir -p /home/$e
-        sshfs tmenninger@willow:/home/$e /home/$e &
-        PIDS="$PIDS $!"
-    done
-
-    wait $PIDS
 }
 
 # Print owners of all changed items
 alias owners="/tools/sitescripts/gcomponent.py -m -o"
 function owner() {
     /tools/sitescripts/gcomponent.py -o $@
-}
-
-# Mount directory
-function sshfs_ghs() {
-    sshfs $1:/export /home/$1
 }
 
 # Set sym links for third party directory
@@ -107,14 +67,12 @@ function set_third_party_symlinks() {
         "built/include"
         "built/lib"
         "built/share"
-        "libusb"
         "built_win64/include"
         "built_win64/lib"
         "libvpx/libvpx-1.8.1"
         "libyuv/libyuv"
         "SDL2/build"
         "protobuf-3.4.1"
-        "protobuf-cpp-3.4.1.tar.gz"
     )
 
     if [ ! -d app_table ]; then
@@ -145,6 +103,9 @@ export PATH=$HOME/.local/bin:$PATH
 # NH2017 directories
 alias nh2017="cd $NH2017"
 
+# Pytest always-options
+export PYTEST_ADDOPTS="-v --mtk_use_bmt --mtk_serial_number=SSNVTO6HMRQCS8KV --default_brightness=9999 --mtk_password=336699 --mtk_reset_via_testbench"
+
 alias nh1='nh 1'
 alias nh2='nh 2'
 alias nh3='nh 3'
@@ -166,6 +127,9 @@ function nh() {
 function aw_yis() {
     ORIG_DIR="$(pwd)"
 
+    update_rtos &
+    UPDATE_RTOS_PID="$!"
+
     if [[ "$(basename $(cd ../ ; pwd))" == *"nh2017"* ]]; then
         echo 1
         cd ..
@@ -186,6 +150,8 @@ function aw_yis() {
     set_third_party_symlinks
 
     GB=/compiler/gbuild
+    wait $UPDATE_RTOS_PID
+
     PIDS=""
     if [[ "$(basename $(pwd))" == *"nh2017"* ]]; then
         # All linux can happen in parallel
@@ -228,8 +194,11 @@ function aw_yis() {
 # Handle a report
 function hr() {
     if [[ ! -d $DEBUG_NH2017 ]]; then
-        echo "Set DEBUG_NH2017!"
-        return 1
+        if [[ ! -d /home/willow/debug-nh2017 ]]; then
+            echo "Set DEBUG_NH2017!"
+            return 1
+        fi
+        export DEBUG_NH2017=/home/willow/debug-nh2017
     fi
 
     CFG=""
@@ -284,10 +253,10 @@ function hr() {
         $SVN revert -R $DEBUG_NH2017
 
         # Go to correct revision
-        $SVN up -r$(cat $REPORT_PATH/rev) $DEBUG_NH2017
+        (cd $DEBUG_NH2017; $SVN up -r$(cat $REPORT_PATH/rev))
 
         # Apply necessary patch
-        $SVN patch $REPORT_PATH/patch $DEBUG_NH2017
+        (cd $DEBUG_NH2017; $SVN patch $REPORT_PATH/patch)
     fi
 
     if $REBUILD; then
@@ -384,17 +353,44 @@ function run() {
     ./run $PHONE_NUM -show-output:$SHOW_OUTPUT $X_SWITCHES $DEBUG ${@:2}
 }
 
-function update_tools() {
+function svn_update_tools() {
     if [ ! -d /tools ]; then
         echo "Nothing at /tools"
         return 1
     fi
 
-    (cd /tools; $SVN up)
+    REV=
+    if [ ! -z $1 ]; then
+        REV=$1
+    fi
+
+    (cd /tools; $SVN up $REV)
     (cd /tools; ./bin/scripts/cvlink update)
-    (cd /tools/linux64-comp && ../dobuild arm64_compiler_val.all linux86_compiler_val.all ghprobe_comp.all osa_linux_kernel.all internal_tools_comp.all)
+}
+
+function build_libs() {
+    (cd /tools/trg && ./build_lib -fixbuildlinks -arm64; ./build_lib -fixbuildlinks -intarm64 -blind; )#./build_lib -fixbuildlinks -linux86)
+}
+
+function update_libs() {
+    svn_update_tools $@
+    build_libs
+}
+
+function build_tools() {
+    (cd /tools/linux64-comp && ../dobuild arm64_compiler_val.all linux86_compiler_val.all internal_tools_comp.all ghprobe_comp.all osa_linux_kernel.all)
     (cd /tools/linux64-ide && ../dobuild everything_ide.all)
-    (cd /tools/trg && ./build_lib -fixbuildlinks -arm64; ./build_lib -fixbuildlinks -intarm64 -blind; ./build_lib -fixbuildlinks -linux86)
+    (cd /tools/trg && ./build_lib -fixbuildlinks -arm64; ./build_lib -fixbuildlinks -intarm64 -blind; )#./build_lib -fixbuildlinks -linux86)
+}
+
+function update_tools_only() {
+    svn_update_tools $@
+    build_tools
+}
+
+function update_tools() {
+    update_tools_only $@
+    build_libs
 }
 
 function update_rtos() {
@@ -424,4 +420,28 @@ if [ -d "/t/toolsvc/trunk/users/" ]; then
     # Copy vimrc file
     cp /home/eng/users/tmenninger/.vimrc ~/.vimrc
 fi
+
+#
+# M O U N T I N G   F S
+#
+
+function sshfs_ghs() {
+    dir="/home/$1"
+    machine="$2"
+    if [[ -z $machine ]]; then
+        machine="$1"
+        # If folder ends in a 2, chop it off
+        if [[ "$machine" =~ .*2 ]]; then
+            machine="${machine::-1}"
+        fi
+    fi
+
+    if [[ ! -d "$dir" ]]; then
+        sudo mkdir -p "$dir"
+        sudo chown tmenninger:root "$dir"
+    else
+        fusermount -u "$dir"
+    fi
+    sshfs "tmenninger@$machine:$dir" "$dir"
+}
 

@@ -8,6 +8,9 @@ export WORKSTATION='tmenninger@willow.ghs.com'
 # Editor of choice
 export EDITOR=vim
 
+# Python3 doesn't find this otherwise
+export PYTHONPATH="/usr/lib/python3/dist-packages"
+
 alias textme="/home/willow/scripts/tools/send_text.py 14846207488"
 alias vim='stty -ixon;vim'
 alias chrome='(google-chrome-stable &> /dev/null) &'
@@ -125,7 +128,7 @@ function mkdir() {
 function cp() {
     svn cp $@ 2> /dev/null
     if [[ $? -ne 0 ]]; then
-        /bin/cp -r $@
+        /bin/cp -rP $@
     fi
 }
 
@@ -182,30 +185,28 @@ shopt -s cmdhist
 # check window size after each command
 shopt -s checkwinsize
 
-# Print a bar the width of the command prompt
-full_bar() {
-    printf '%*s' $(($COLUMNS-12)) | tr ' ' -;printf '  %s' $(date +"%H:%M:%S")
-}
-# Show the git branch at command line
-parse_git_branch() {
-    git branch &> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
-}
-
 # Time of last command and now so we can show duration of all commands
 PROMPT_COMMAND='build_ps1'
+
+sandbox() {
+    mv $1 /home/willow/sandbox/
+}
 
 shopt -s extdebug
 preexec_invoke_exec() {
     [ -n "$COMP_LINE" ] && return # do nothing if completing
-    [ "$BASH_COMMAND" = "$PROMPT_COMMAND" ] && return # don't cause preexec for PROMPT_COMMAND
+    [ ":" == "$BASH_COMMAND" ] && return
+    [ "tr ' ' -" == "$BASH_COMMAND" ] && return
+    [ "$BASH_COMMAND" == "$PROMPT_COMMAND" ] && return
 
     # So we don't get locked accidentally
     local this_command=`HISTTIMEFORMAT= history 1 | sed -e "s/^[ ]*[0-9]*[ ]*//"`;
-    if [ "shopt -u extdebug" == "$this_command" ]; then
-        return 0
-    fi
+    [ "shopt -u extdebug" == "$this_command" ] && return
 
-    LAST_CMD_START_TIME=$(date '+%s')
+    # Store time
+    if [ -z $LAST_CMD_START_TIME ]; then
+        LAST_CMD_START_TIME=$(date '+%s')
+    fi
 }
 trap 'preexec_invoke_exec' DEBUG
 
@@ -214,12 +215,41 @@ build_ps1() {
     if [ ! -z $LAST_CMD_START_TIME ]; then
         LAST_CMD_END_TIME="$(date '+%s')"
         ELAPSED=$((LAST_CMD_END_TIME-LAST_CMD_START_TIME))
-        LAST_CMD_START_TIME=
+        unset LAST_CMD_START_TIME
+
+        ((SECS=$ELAPSED%60))
+        ((MINS=($ELAPSED/60)%60))
+        ((HOURS=($ELAPSED/60/60)%24))
+        ((DAYS=$ELAPSED/60/60/24))
+
+        TIME_STR="${SECS}s"
+        if [ $MINS != 0 ]; then
+            TIME_STR="${MINS}m $TIME_STR"
+        fi
+        if [ $HOURS != 0 ]; then
+            if [ $MINS == 0 ]; then
+                TIME_STR="${MINS}m $TIME_STR"
+            fi
+            TIME_STR="${HOURS}h $TIME_STR"
+        fi
+        if [ $DAYS != 0 ]; then
+            if [ $HOURS == 0 ]; then
+                if [ $MINS == 0 ]; then
+                    TIME_STR="${MINS}m $TIME_STR"
+                fi
+                TIME_STR="${HOURS}h $TIME_STR"
+            fi
+            TIME_STR="${DAYS}d $TIME_STR"
+        fi
+
 
         printf '%*s' $(($COLUMNS)) | tr ' ' ' '
-        RUNTIME="Time: $(date -d "@$ELAPSED" '+%Mm %Ss') "
+        RUNTIME="Time: $TIME_STR "
     fi
 
-    export PS1="\${RUNTIME}\n\$(full_bar)\n\W $ "
+    # Print a bar the width of the command prompt
+    FULL_BAR=$(printf '%*s' $(($COLUMNS-12)) | tr ' ' -;printf '  %s' $(date +"%H:%M:%S"))
+
+    export PS1="\${RUNTIME}\n\${FULL_BAR}\n\W $ "
 }
 

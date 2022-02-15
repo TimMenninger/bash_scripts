@@ -4,16 +4,6 @@
 set nocompatible
 "filetype off
 
-"" Setting up vundle
-"set rtp+=~/.vim/bundle/Vundle.vim
-"call vundle#begin()
-"Plugin 'VundleVim/Vundle.vim'
-"
-"Plugin 'wincent/command-t'
-"Plugin 'terryma/vim-multiple-cursors'
-"
-"call vundle#end()
-
 " Attempt to determine the type of a file based on name
 filetype indent plugin on
 
@@ -184,39 +174,4 @@ endif
 
 " Don't wrap lines
 set nowrap
-
-""""""""""""" PLUGINS """"""""""""""
-
-" Plugin to use fuzzy searching
-"set runtimepath^=~/.vim/bundle/ctrlp-cmatcher.vim
-"let g:ctrlp_match_func = {'match' : 'matcher#cmatch' }
-set runtimepath^=~/.vim/bundle/ctrlp.vim
-let g:ctrlp_custom_ignore = {
-    \ 'dir': '\v[\/](\.svn|objs|bin)$',
-    \ 'file': '\v\.(swp,zip,tar,gz,o,d,dbo,dnm,dla,dep)$',
-    \ }
-let g:ctrlp_map = '<c-p>'
-let g:ctrlp_cmd = 'CtrlP'
-let g:ctrlp_switch_buffer = 'et'
-set wildignore+=*/tmp*,*.so,*.swp,*.zip,*.orig,*.dep,*.dla,*.dnm,*.o,*.d,*.dbo
-let g:ctrlp_user_command = 'find %s -type f'
-let g:ctrlp_working_path_mode = 'ra'
-let g:ctrlp_root_markers = [ '.svn' ]
-"set runtimepath^=~/.vim/bundle/command-t.vim
-"let g:CommandTMaxFiles=20000
-
-" Multiple cursor stuff
-" set runtimepath^=~/.vim/bundle/vim-multiple-cursors.vim
-" let g:multi_cursor_next_key = '<c-d>'
-" let g:multi_cursor_prev_key = '<c-b>'
-" let g:multi_cursor_skip_key = '<c-x>'
-" let g:multi_cursor_quit_key = '<Esc>'
-" let g:multi_cursor_start_key = '<c-d>'
-" let g:multi_cursor_start_word_key = '<c-d>'
-
-" Plugin to surround with braces when highlighted
-set runtimepath^=~/.vim/bundle/vim-surround.vim
-
-set runtimepath^=~/.vim/bundle/Rename.vim
-
 

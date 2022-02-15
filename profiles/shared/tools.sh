@@ -1,19 +1,14 @@
 #!/bin/bash -l
 
 # IP for ssh'ing into laptop
-export LAPTOP="tmenninger@192.168.98.34"
-export DESKTOP='tmenninger@192.168.1.101'
-export WORKSTATION='tmenninger@willow.ghs.com'
+
+# Stupid keyboard can't tilde
+export TD=~
 
 # Editor of choice
 export EDITOR=vim
 
-# Python3 doesn't find this otherwise
-export PYTHONPATH="/usr/lib/python3/dist-packages"
-
-alias textme="/home/willow/scripts/tools/send_text.py 14846207488"
 alias vim='stty -ixon;vim'
-alias chrome='(google-chrome-stable &> /dev/null) &'
 alias vimrc='vim ~/.vimrc'
 alias sourcebash='source $BASH_PROFILE'
 alias bashprofile='vim $BASH_PROFILE;sourcebash'
@@ -22,8 +17,6 @@ alias home='cd ~'
 alias desktop='cd ~/Desktop'
 alias downloads='cd ~/Downloads'
 alias ll='ls -lah'
-alias locate1='locate -n1'
-alias off='poweroff'
 alias please='sudo !!'
 
 function gr () {
@@ -55,13 +48,6 @@ function catline()
     head -n $LINE $FILE | tail -n 1
 
     return 0
-}
-
-# Create ssh keys
-function ssh_key() {
-    yes "" | ssh-keygen -t rsa -f /keys/${1}-ssh
-    ssh-copy-id -i ~/.ssh/id_rsa.pub tmenninger@$1.ghs.com
-    yes "" | ssh-add
 }
 
 # Move window
@@ -108,28 +94,16 @@ function clean() {
 
 # When in svn directories, prepend 'svn' onto mkdir, mv, cp and rm
 function mv() {
-    svn mv $@ 2> /dev/null
-    if [[ $? -ne 0 ]]; then
-        /bin/mv $@
-    fi
+    /bin/mv $@
 }
 function rm() {
-    svn del $@ 2> /dev/null
-    if [[ $? -ne 0 ]]; then
-        /bin/rm -rf $@
-    fi
+    /bin/rm -rf $@
 }
 function mkdir() {
-    svn mkdir $@ 2> /dev/null
-    if [[ $? -ne 0 ]]; then
-        /bin/mkdir $@
-    fi
+    /bin/mkdir -p $@
 }
 function cp() {
-    svn cp $@ 2> /dev/null
-    if [[ $? -ne 0 ]]; then
-        /bin/cp -rP $@
-    fi
+    /bin/cp -rP $@
 }
 
 # uncomment for a colored prompt, if the terminal has the capability; turned
@@ -187,10 +161,6 @@ shopt -s checkwinsize
 
 # Time of last command and now so we can show duration of all commands
 PROMPT_COMMAND='build_ps1'
-
-sandbox() {
-    mv $1 /home/willow/sandbox/
-}
 
 shopt -s extdebug
 preexec_invoke_exec() {
@@ -253,3 +223,6 @@ build_ps1() {
     export PS1="\${RUNTIME}\n\${FULL_BAR}\n\W $ "
 }
 
+function abspath {
+  (cd "$(dirname '$1')" &>/dev/null && printf "%s/%s" "$PWD" "${1##*/}")
+}

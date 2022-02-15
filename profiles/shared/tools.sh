@@ -8,6 +8,7 @@ export TD=~
 # Editor of choice
 export EDITOR=vim
 
+alias scripts='cd $HOME/scripts'
 alias vim='stty -ixon;vim'
 alias vimrc='vim ~/.vimrc'
 alias sourcebash='source $BASH_PROFILE'

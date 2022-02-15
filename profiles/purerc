@@ -1,6 +1,5 @@
 #!/bin/bash -l
 
-HOME="/Users/tmenninger"
 SCRIPTS_PATH="${HOME}/scripts"
 
 # Bash profile

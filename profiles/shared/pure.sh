@@ -6,7 +6,7 @@ function rs2vm() {
     REMOTE_HOST=ir@irdv-tmenninger
 
     SRC=/Users/tmenninger/code/ir-tmenninger
-    DST=/home/ir/code
+    DST=$REMOTE_HOST:/home/ir/code
 
     # NOTE: only to be used from mac
     if [ ! -d $SRC ]; then
@@ -15,12 +15,12 @@ function rs2vm() {
         return 1
     fi
 
-    $SCRIPTS_PATH/tools/rsync.sh $SRC $REMOTE_HOST:$DST
+    $SCRIPTS_PATH/tools/rsync.sh $SRC $DST
 }
 function rs2mac() {
     REMOTE_HOST=ir@irdv-tmenninger
 
-    SRC=/home/ir/code/ir-tmenninger
+    SRC=$REMOTE_HOST:/home/ir/code/ir-tmenninger
     DST=/Users/tmenninger/code
 
     # NOTE: only to be used from mac
@@ -30,7 +30,7 @@ function rs2mac() {
         return 1
     fi
 
-    $SCRIPTS_PATH/tools/rsync.sh $SRC $REMOTE_HOST:$DST
+    $SCRIPTS_PATH/tools/rsync.sh $SRC $DST
 }
 
 function code() {

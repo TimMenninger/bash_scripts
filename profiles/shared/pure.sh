@@ -1,6 +1,41 @@
 #!/bin/bash -l
 
-alias vm='ssh ir@irdv-tmenninger'
+alias vm="ssh ir@irdv-tmenninger"
+
+function rs2vm() {
+    REMOTE_HOST=ir@irdv-tmenninger
+
+    SRC=/Users/tmenninger/code/ir-tmenninger
+    DST=/home/ir/code
+
+    # NOTE: only to be used from mac
+    if [ ! -d $SRC ]; then
+        echo "expect $SRC to exist"
+        echo "NOTE: only to be used from mac terminal"
+        return 1
+    fi
+
+    $SCRIPTS_PATH/tools/rsync.sh $SRC $REMOTE_HOST:$DST
+}
+function rs2mac() {
+    REMOTE_HOST=ir@irdv-tmenninger
+
+    SRC=/home/ir/code/ir-tmenninger
+    DST=/Users/tmenninger/code
+
+    # NOTE: only to be used from mac
+    if [ ! -d $DST ]; then
+        echo "expect $DST to exist"
+        echo "NOTE: only to be used from mac terminal"
+        return 1
+    fi
+
+    $SCRIPTS_PATH/tools/rsync.sh $SRC $REMOTE_HOST:$DST
+}
+
+function code() {
+    cd /code/$1
+}
 
 # Create ssh keys
 function ssh_key() {

@@ -1,6 +1,6 @@
 #!/bin/bash -l
 
-SCRIPTS_PATH="${HOME}/scripts"
+SCRIPTS_PATH="${HOME}/scripts/tmenninger"
 
 # Bash profile
 export BASH_PROFILE="${HOME}/.bashrc"

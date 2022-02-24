@@ -2,6 +2,22 @@
 
 alias vm="ssh ir@irdv-tmenninger"
 
+function gbrj() {
+    # Checks out a (g)it (br)anch for (j)ira. Argument should be the jira, e.g.
+    # IR-#####
+
+    JIRA=$1
+    if [ -z "$JIRA" ]; then
+        echo "ERROR: must supply jira"
+        echo "usage: gbrj <JIRA>"
+        echo "        will create a branch called users/tmenninger/<JIRA>"
+        return 1
+    fi
+
+    BRANCH_NAME=users/tmenninger/$JIRA
+    git checkout -b $BRANCH_NAME && git push -u origin $BRANCH_NAME
+}
+
 function rs2vm() {
     REMOTE_HOST=ir@irdv-tmenninger
 

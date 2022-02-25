@@ -3,34 +3,10 @@
 alias vm="ssh ir@irdv-tmenninger"
 
 function rs2vm() {
-    REMOTE_HOST=ir@irdv-tmenninger
-
-    SRC=/Users/tmenninger/code/ir-tmenninger
-    DST=$REMOTE_HOST:/home/ir/code
-
-    # NOTE: only to be used from mac
-    if [ ! -d $SRC ]; then
-        echo "expect $SRC to exist"
-        echo "NOTE: only to be used from mac terminal"
-        return 1
-    fi
-
-    $SCRIPTS_PATH/tools/rsync.sh $SRC $DST
+    $SCRIPTS_PATH/tools/rs2vm.sh
 }
 function rs2mac() {
-    REMOTE_HOST=ir@irdv-tmenninger
-
-    SRC=$REMOTE_HOST:/home/ir/code/ir-tmenninger
-    DST=/Users/tmenninger/code
-
-    # NOTE: only to be used from mac
-    if [ ! -d $DST ]; then
-        echo "expect $DST to exist"
-        echo "NOTE: only to be used from mac terminal"
-        return 1
-    fi
-
-    $SCRIPTS_PATH/tools/rsync.sh $SRC $DST
+    $SCRIPTS_PATH/tools/rs2mac.sh
 }
 
 function code() {

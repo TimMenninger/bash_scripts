@@ -20,8 +20,34 @@ alias downloads='cd ~/Downloads'
 alias ll='ls -lah'
 alias please='sudo !!'
 
+function decolor() {
+    # From https://unix.stackexchange.com/questions/111899/how-to-strip-color-codes-out-of-stdout-and-pipe-to-file-and-stdout
+    sed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g"
+}
+
 function gr () {
-	grep -irn --color --binary-files=without-match --exclude-dir=".svn*" $1 *
+    GREP_COMMAND="grep -irn --color --binary-files=without-match $@"
+    GREP_RESULT=$(unbuffer ${GREP_COMMAND})
+
+    # This one to console with color
+    echo "$GREP_RESULT"
+
+    # This one to file without color
+    GREP_OPTIONS="$(echo "$@" | sed "s/^\s*\(\S.*\S\)\s*$/\1/g" | sed "s/[^_a-zA-Z0-9-]/./g")"
+    GREP_DATE=$(date +%F_%T)
+    GREP_FNAME="/tmp/${GREP_DATE}___\$.${GREP_OPTIONS}.grepout"
+
+    echo "$GREP_COMMAND" > $GREP_FNAME
+    echo "" >> $GREP_FNAME
+    echo "$GREP_RESULT" | decolor >> $GREP_FNAME
+
+    echo ""
+    echo "Output in $GREP_FNAME"
+    ln -sf "$GREP_FNAME" /tmp/aaa_last_grep
+}
+
+function lg() {
+    vim /tmp/aaa_last_grep
 }
 
 function pids () {
@@ -181,6 +207,11 @@ preexec_invoke_exec() {
 }
 trap 'preexec_invoke_exec' DEBUG
 
+# for showing branch at command line
+parse_git_branch() {
+    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
+}
+
 build_ps1() {
     RUNTIME=
     if [ ! -z $LAST_CMD_START_TIME ]; then
@@ -218,12 +249,13 @@ build_ps1() {
         RUNTIME="Time: $TIME_STR "
     fi
 
-    # Print a bar the width of the command prompt
-    FULL_BAR=$(printf '%*s' $(($COLUMNS-12)) | tr ' ' -;printf '  %s' $(date +"%H:%M:%S"))
+    # Print a bar the width of the command prompt 
+    FULL_BAR=$(printf '%*s' $(($COLUMNS-12)) | tr ' ' '-';printf '  %s' $(date +"%H:%M:%S"))
 
-    export PS1="\${RUNTIME}\n\${FULL_BAR}\n$(whoami):\W $ "
+    # parse git branch from https://coderwall.com/p/fasnya/add-git-branch-name-to-bash-prompt
+    export PS1='\[\033[00m\]\[\033[104m\]${RUNTIME}\[\033[49m\]\n\u@\h:\w\n\[\033[33m\]$(parse_git_branch)\[\033[00m\] \$ '
 }
 
 function abspath {
-  (cd "$(dirname '$1')" &>/dev/null && printf "%s/%s" "$PWD" "${1##*/}")
+    (cd "$(dirname '$1')" &>/dev/null && printf "%s/%s" "$PWD" "${1##*/}")
 }

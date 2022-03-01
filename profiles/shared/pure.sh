@@ -14,6 +14,8 @@ function gbrj() {
         return 1
     fi
 
+    git checkout feature/darforce && git pull
+
     BRANCH_NAME=users/tmenninger/$JIRA
     git checkout -b $BRANCH_NAME && git push -u origin $BRANCH_NAME
 }

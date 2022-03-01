@@ -140,7 +140,7 @@ nnoremap <F3> :set hlsearch!<CR>
 noremap <c-s> :source ~/.vimrc<CR>
 
 " Remove trailing whitespace on ctrl+w
-noremap <c-w> :%s/\s\+$//e<CR>
+noremap <c-q> :%s/\s\+$//e<CR>
 
 " Highlight current line
 if exists('+colorcolumn')

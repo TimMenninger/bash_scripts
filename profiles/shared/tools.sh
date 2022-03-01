@@ -213,6 +213,8 @@ parse_git_branch() {
 }
 
 build_ps1() {
+    export PS1=' \$ '
+
     RUNTIME=
     if [ ! -z $LAST_CMD_START_TIME ]; then
         LAST_CMD_END_TIME="$(date '+%s')"
@@ -247,13 +249,14 @@ build_ps1() {
 
         printf '%*s' $(($COLUMNS)) | tr ' ' ' '
         RUNTIME="Time: $TIME_STR "
+
+        # parse git branch from https://coderwall.com/p/fasnya/add-git-branch-name-to-bash-prompt
+        export PS1='\[\033[00m\]${RUNTIME}\[\033[104m\]\n${FULL_BAR}\[\033[49m\]\n\u@\h:\w\n\[\033[33m\]$(parse_git_branch)\[\033[00m\]\n \$ '
     fi
 
-    # Print a bar the width of the command prompt 
-    FULL_BAR=$(printf '%*s' $(($COLUMNS-12)) | tr ' ' '-';printf '  %s' $(date +"%H:%M:%S"))
-
-    # parse git branch from https://coderwall.com/p/fasnya/add-git-branch-name-to-bash-prompt
-    export PS1='\[\033[00m\]\[\033[104m\]${RUNTIME}\[\033[49m\]\n\u@\h:\w\n\[\033[33m\]$(parse_git_branch)\[\033[00m\] \$ '
+    # Print a bar the width of the command prompt (character goes inside second 
+    # set of empty '')
+    FULL_BAR=$(printf '%*s' $(($COLUMNS-12)) | tr ' ' ' ';printf '  %s' $(date +"%H:%M:%S"))
 }
 
 function abspath {

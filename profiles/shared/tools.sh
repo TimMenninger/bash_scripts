@@ -17,7 +17,7 @@ alias bashrc='vim $BASH_PROFILE;sourcebash'
 alias home='cd ~'
 alias desktop='cd ~/Desktop'
 alias downloads='cd ~/Downloads'
-alias ll='ls -lah'
+alias ll='ls -lah --color'
 alias please='sudo !!'
 
 function decolor() {
@@ -203,17 +203,22 @@ preexec_invoke_exec() {
     # Store time
     if [ -z $LAST_CMD_START_TIME ]; then
         LAST_CMD_START_TIME=$(date '+%s')
+        printf "\033[1;39m$(date +%H:%M:%S)\033[0;39m\n"
     fi
 }
 trap 'preexec_invoke_exec' DEBUG
 
 # for showing branch at command line
 parse_git_branch() {
-    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
+    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\n(\1)/'
+}
+
+remove_trailing_slash() {
+    echo $1 | sed -e "s/\(.*\)\/$/\1/"
 }
 
 build_ps1() {
-    export PS1=' \$ '
+    export PS1='\[\033[0;39m\]\W $ '
 
     RUNTIME=
     if [ ! -z $LAST_CMD_START_TIME ]; then
@@ -248,10 +253,10 @@ build_ps1() {
 
 
         printf '%*s' $(($COLUMNS)) | tr ' ' ' '
-        RUNTIME="Time: $TIME_STR "
+        RUNTIME="$(date +%H:%M:%S) (Elapsed: $TIME_STR)"
 
         # parse git branch from https://coderwall.com/p/fasnya/add-git-branch-name-to-bash-prompt
-        export PS1='\[\033[00m\]${RUNTIME}\[\033[104m\]\n${FULL_BAR}\[\033[49m\]\n\u@\h:\w\n\[\033[33m\]$(parse_git_branch)\[\033[00m\]\n \$ '
+        export PS1='\n\[\033[31m\]\u@\h:\[\033[1;35m\]$(remove_trailing_slash $(dirname \w))/$(basename \w)\[\033[1;33m\]$(parse_git_branch)\[\033[39m\]\[\033[104m\]\n${RUNTIME}\[\033[49m\]\n\[\033[0;39m\]\W $ '
     fi
 
     # Print a bar the width of the command prompt (character goes inside second 

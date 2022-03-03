@@ -2,6 +2,22 @@
 
 alias vm="ssh root@irdv-tmenninger"
 
+export PATH=$PATH:/usr/local/go/bin
+
+function nested_vm() {
+    if [ $# -ne 2 ]; then
+        echo "usage: nested_vm <VM_NAME> <IMG_PATH>"
+        return 1
+    fi
+
+    NAME=$1
+    IMG=$2
+
+    virsh destroy $NAME
+    virsh undefine $NAME
+    virt-install --name $NAME --ram 2048 --vcpu 4 --disk $IMG --import --os-variant ubuntutrusty
+}
+
 function smeld() {
     if [ $# -ne 2 ]; then
         echo "Must give 2 files"

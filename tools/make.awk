@@ -10,88 +10,107 @@ BEGIN {
     # Default to printing everythin to stdout and not having a separate error
     # file
     if (!FULL_OUTPUT_FILE) FULL_OUTPUT_FILE="/dev/stdout";
-    if (!ERROR_OUTPUT_FILE) ERROR_OUTPUT_FILE="/dev/null";
     currentState = 0;
     diags = "";
+    notes = "";
     totwarn = 0;
     toterr = 0;
+    totfail = 0;
+    totnotes = 0;
 }
 # These blocks of code run once for each line of output from gbuild
 # Use a small state machine to parse gbuild output
 {
+    nextState = currentState == 0 ? 0 : currentState-1;
     if (currentState == 0) {
         # Initial state, this is output directly from gbuild
 
         # Check for and colorize any warning or error lines
-        haswarn  =sub(/^[\S]+:[0-9]+[0-9]+: warning[^:]*:/, CLR_WARN "&" CLR_CLEAR);
-        haserr   =sub(/^[\S]+:[0-9]+[0-9]+: (fatal )?error[^:]*:/  , CLR_ERR "&" CLR_CLEAR);
-        # Colorize other miscelaneous output
-        sub(/^Done/, CLR_GOOD "&" CLR_CLEAR);
-        sub(/^Build target '[^']*' failed/, CLR_ERR "&" CLR_CLEAR);
-        sub(/^Error:.*/, CLR_ERR "&" CLR_CLEAR);
-        sub(/^Building .*/, CLR_MISC "&" CLR_CLEAR);
-        sub(/^Cleaning .*/, CLR_MISC "&" CLR_CLEAR);
+        haswarn  =sub(/^\S+:[0-9]+:([0-9]+:)? warning[^:]*:/, CLR_WARN "&" CLR_CLEAR);
+        haserr   =sub(/^\S+:[0-9]+:([0-9]+:)? error[^:]*:/, CLR_ERR "&" CLR_CLEAR);
+        hasfail  =sub(/^\S*Makefile:[0-9]+: recipe for target '[^']+' failed/, CLR_ERR "&" CLR_CLEAR);
 
-        if (haswarn > 0 || haserr > 0) {
+        # Random sometimes-important outputs from make
+        hasmake  =sub(/^make\[[0-9]+\]: /, CLR_OUTPUT "&" CLR_CLEAR);
+
+        if (haswarn > 0 || haserr > 0 || hasfail > 0) {
             # This is the first line of a compiler diagnostic (warning/error)
             # Bump the appropriate counter
             totwarn += haswarn;
             toterr  += haserr;
+            totfail += hasfail;
             # Store this line of the diagnostic, and switch to the state for saving diagnostic output
             diags = diags $0 "\n";
-            currentState = 1;
-            # Grab a short version of the diagnostic (file, line, diag number) and print it
-            match($0, /^.*(warning|error)[^:]*/, diagRegion);
-            if (INCREMENTAL_ERRORS) {
-                print $0 > FULL_OUTPUT_FILE;
-            } else {
-                print diagRegion[0] CLR_CLEAR > FULL_OUTPUT_FILE;
+
+            ## # Grab a short version of the diagnostic (file, line, diag number) and print it
+            ## match($0, /^.*(warning|error)[^:]*/, diagRegion);
+            ## print $0 > FULL_OUTPUT_FILE;
+
+            # One more line diagnostic for make error, two lines for compile,
+            # none more for no make target. States numbered for how many more
+            # lines of diagnostic
+            if (hasfail > 0) {
+                nextState = 1;
+            } else if (haswarn > 0 || haserr > 0) {
+                nextState = 2;
             }
-            print ERROR_OUTPUT_PREFIX " " $0 > ERROR_OUTPUT_FILE;
         } else {
-            # Standard gbuild output
-            print > FULL_OUTPUT_FILE;
+            # Always highlight "error" and "warning" and "fail" for visibility,
+            # but only here if we didn't care enough to report it
+            IGNORECASE = 1
+            sub(/<warn(ing)?(:)?>/, CLR_WARN "&" CLR_CLEAR);
+            sub(/<error(:)?>/, CLR_ERR "&" CLR_CLEAR);
+            sub(/<fail(ure|ed)?(:)?>/, CLR_ERR "&" CLR_CLEAR);
+
+            # Notes, will match some errors but are only considered if the line 
+            # isn't otherwise determined to be a warning or error
+            hasnote  =sub(/^\([^\*]*\*\*\*[^\*]*$/, "&");
+            hasnote +=sub(/^\S*Makefile:[0-9]+: /, CLR_OUTPUT "&" CLR_CLEAR);
+            if (hasnote > 0) {
+                diags = diags $0 "\n";
+                notes = notes $0 "\n";
+            }
+            totnotes += hasnote;
         }
-    } else if (currentState == 1) {
-        # Currently in the detailed message for a warning/error. Save the contents to print at the end
-        if ($0 == "") {
-            # Detailed messages are terminated by a blank line. Switch back to the default state.
-            currentState = 0;
-        } else {
-            # Store the line of diagnostic output
-            diags = diags $0 "\n";
-            print ERROR_OUTPUT_PREFIX " " $0 > ERROR_OUTPUT_FILE
-            if (INCREMENTAL_ERRORS) print $0 > FULL_OUTPUT_FILE
+    } else {
+        isignored =sub(/^make\[[0-9]+\]:.*\(ignored\)$/, "&");
+        if (isignored > 0) {
+            totfail -= 1;
         }
-    } else if (currentState == 2) {
-        # Linker error, this line is another line of error, then return to normal after
+
+        # Store the line of diagnostic output
         diags = diags $0 "\n";
-        print ERROR_OUTPUT_PREFIX " " $0 > ERROR_OUTPUT_FILE
-        if (INCREMENTAL_ERRORS) print $0 > FULL_OUTPUT_FILE
-        currentState = 0;
     }
+
+    print $0 > FULL_OUTPUT_FILE;
+    currentState = nextState;
 }
 END {
     # Print a final build summary if any warnings/errors occurred
-    if (totwarn > 0 || toterr > 0) {
-        print CLR_MISC "======== WARNINGS/ERRORS ========" CLR_CLEAR > FULL_OUTPUT_FILE;
+    if (totnotes > 0) {
+        print CLR_MISC "\n\n============= NOTES =============" CLR_CLEAR > FULL_OUTPUT_FILE;
+        print notes > FULL_OUTPUT_FILE;
+    }
+
+    if (totwarn > 0 || toterr > 0 || totfail > 0) {
+        print CLR_MISC "\n\n======== WARNINGS/ERRORS ========" CLR_CLEAR > FULL_OUTPUT_FILE;
         print diags > FULL_OUTPUT_FILE;
-        if (LOG_FILE) {
-            if (COLORIZE_LOG_FILE) {
-                print diags > LOG_FILE;
-            } else {
-                nocolor_diags = diags
-                gsub(/\033\[[0-9]+m/, "", nocolor_diags);
-                print nocolor_diags > LOG_FILE;
-            }
+
+        if (totwarn > 0) {
+            print CLR_WARN "Total warnings: " CLR_CLEAR totwarn > FULL_OUTPUT_FILE;
         }
-    }
-    if (totwarn > 0) {
-        print CLR_WARN "Total warnings: " CLR_CLEAR totwarn > FULL_OUTPUT_FILE;
-        print ERROR_OUTPUT_PREFIX " " CLR_WARN "Total warnings: " CLR_CLEAR totwarn > ERROR_OUTPUT_FILE;
-    }
-    if (toterr  > 0) {
-        print CLR_ERR  "Total errors: "   CLR_CLEAR toterr > FULL_OUTPUT_FILE;
-        print ERROR_OUTPUT_PREFIX " " CLR_ERR  "Total errors: "   CLR_CLEAR toterr > ERROR_OUTPUT_FILE;
+        if (toterr  > 0) {
+            print CLR_ERR  "Total errors: "   CLR_CLEAR toterr > FULL_OUTPUT_FILE;
+        }
+    } 
+
+    print CLR_MISC "\n\n=================================" CLR_CLEAR > FULL_OUTPUT_FILE;
+
+    if (toterr > 0 || totfail > 0) {
+        print CLR_ERR "Build Failed" CLR_CLEAR > FULL_OUTPUT_FILE;
+    } else if (totwarn > 0) {
+        print CLR_WARN "Build Succeeded with " totwarn " Warning(s)" CLR_CLEAR > FULL_OUTPUT_FILE
+    } else {
+        print CLR_GOOD "Build Succeeded" CLR_CLEAR > FULL_OUTPUT_FILE
     }
 }

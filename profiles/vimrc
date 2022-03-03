@@ -30,6 +30,24 @@ set splitbelow
 " Syntax highlighting
 syntax on
 
+" ctags
+set tags+=/home/ir/code/bld_linux/1iridium/tags
+function! UseNearestParentTagsFile()
+let l:path = "%:p"
+    while expand(l:path) != "/"
+    let l:path = l:path . ":h"
+    if filereadable(expand(l:path) . "/tags")
+        exe "set tags=" . expand(l:path) . "/tags"
+        return
+    endif
+    endwhile
+    echom "No tags file found in path."
+endfunction
+command! UseNearestParentTagsFile call UseNearestParentTagsFile()
+nnoremap <leader>st :UseNearestParentTagsFile<cr>
+
+map <C-\> :vsp <CR>:exec("tag ".expand("<cword>"))<CR>
+
 " Set color column
 highlight ColorColumn ctermbg=6
 
@@ -139,8 +157,11 @@ nnoremap <F3> :set hlsearch!<CR>
 " Save as control s
 noremap <c-s> :source ~/.vimrc<CR>
 
-" Remove trailing whitespace on ctrl+w
+" Remove trailing whitespace on ctrl+q
 noremap <c-q> :%s/\s\+$//e<CR>
+
+" Remove whitespace from empty lines
+autocmd BufWritePre * :%s/^\s\+$//e
 
 " Highlight current line
 if exists('+colorcolumn')

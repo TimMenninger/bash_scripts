@@ -20,7 +20,7 @@ alias downloads='cd ~/Downloads'
 alias ll='ls -lah --color'
 alias please='sudo !!'
 
-####### M A C   O V E R R I D E S #######
+################# M A C   O V E R R I D E S #################
 if [[ "$(uname -s)" == Darwin* ]]; then
     # Colors in mac for ls uses -G instead of --color
     unalias ll
@@ -29,6 +29,23 @@ if [[ "$(uname -s)" == Darwin* ]]; then
     # Make background random color
     ${SCRIPTS_PATH}/tools/mac_terminal_random_bg.scpt
 fi
+#############################################################
+
+function bak() {
+    NAME=${1%/}
+    BAKNAME=/bak/$(basename ${NAME}).$(date +%Y-%m-%d.%H:%M:%S).bak
+    cp -a ${NAME} ${BAKNAME}
+
+    echo "/bin/bash -xe" > ${RBAKNAME}
+    echo "rm -rf ${NAME} && cp -a ${BAKNAME} ${NAME}" >> ${RBAKNAME}
+    chmod +x ${RBAKNAME}
+}
+
+alias make="color_make"
+function color_make() {
+    command make "$@" |& awk -f ${SCRIPTS_PATH}/tools/make.awk
+    return ${PIPESTATUS[0]}
+}
 
 function decolor() {
     # From https://unix.stackexchange.com/questions/111899/how-to-strip-color-codes-out-of-stdout-and-pipe-to-file-and-stdout
@@ -37,7 +54,7 @@ function decolor() {
 
 function gr () {
     GREP_COMMAND="grep -irn --color --binary-files=without-match $@"
-    GREP_RESULT=$(unbuffer ${GREP_COMMAND})
+    GREP_RESULT=$(unbuffer "${GREP_COMMAND}")
 
     # This one to console with color
     echo "$GREP_RESULT"
@@ -53,6 +70,7 @@ function gr () {
 
     echo ""
     echo "Output in $GREP_FNAME"
+    rm /tmp/aaa_last_grep
     ln -sf "$GREP_FNAME" /tmp/aaa_last_grep
 }
 
@@ -213,7 +231,7 @@ preexec_invoke_exec() {
     # Store time
     if [ -z $LAST_CMD_START_TIME ]; then
         LAST_CMD_START_TIME=$(date '+%s')
-        printf "\033[1;39m$(date +%H:%M:%S)\033[0;39m\n"
+        case $- in *i*) printf "\033[1;39m$(date +%H:%M:%S)\033[0;39m\n"; esac
     fi
 }
 trap 'preexec_invoke_exec' DEBUG

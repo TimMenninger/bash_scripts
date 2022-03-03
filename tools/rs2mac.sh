@@ -1,4 +1,4 @@
-#!/usr/bin/env /bin/bash -l
+#!/usr/bin/env /bin/bash
 
 REMOTE_HOST=ir@irdv-tmenninger
 
@@ -9,7 +9,7 @@ DST=/Users/tmenninger
 if [ ! -d $DST ]; then
     echo "expect $DST to exist"
     echo "NOTE: only to be used from mac terminal"
-    return 1
+    exit
 fi
 
 rsync -azP $SRC $DST

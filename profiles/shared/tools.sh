@@ -20,6 +20,16 @@ alias downloads='cd ~/Downloads'
 alias ll='ls -lah --color'
 alias please='sudo !!'
 
+####### M A C   O V E R R I D E S #######
+if [[ "$(uname -s)" == Darwin* ]]; then
+    # Colors in mac for ls uses -G instead of --color
+    unalias ll
+    alias ll='ls -lah -G'
+
+    # Make background random color
+    ${SCRIPTS_PATH}/tools/mac_terminal_random_bg.scpt
+fi
+
 function decolor() {
     # From https://unix.stackexchange.com/questions/111899/how-to-strip-color-codes-out-of-stdout-and-pipe-to-file-and-stdout
     sed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g"

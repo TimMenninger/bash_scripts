@@ -1,6 +1,23 @@
 #!/bin/bash -l
 
-alias vm="ssh ir@irdv-tmenninger"
+alias vm="ssh root@irdv-tmenninger"
+
+function smeld() {
+    if [ $# -ne 2 ]; then
+        echo "Must give 2 files"
+        return 1
+    fi
+
+    if [[ "$(hostname)" != "tmenninger--MacBookPro16" ]]; then
+        echo "Must be on mac"
+        return 1
+    fi
+
+    FILE1=$1
+    FILE2=$2
+
+    meld <(ssh root@irdv-tmenninger cat $FILE1) <(ssh root@irdv-tmenninger cat $FILE2)
+}
 
 function gbrj() {
     # Checks out a (g)it (br)anch for (j)ira. Argument should be the jira, e.g.

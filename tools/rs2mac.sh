@@ -12,5 +12,6 @@ if [ ! -d $DST ]; then
     return 1
 fi
 
-rsync -azP $SRC $DST
-git -C $DST/iridium status
+sudo rsync -azP $SRC $DST
+git -C $DST/1iridium status
+git -C $DST/2iridium status

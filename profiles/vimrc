@@ -30,6 +30,13 @@ set splitbelow
 " Syntax highlighting
 syntax on
 
+" ctags
+set tags+=/home/ir/code/bld_linux/1iridium/tags
+set tags+=/home/ir/code/bld_linux/2iridium/tags
+
+map <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR>
+map <A-]> :vsp <CR>:exec("tag ".expand("<cword>"))<CR>
+
 " Set color column
 highlight ColorColumn ctermbg=6
 
@@ -139,8 +146,11 @@ nnoremap <F3> :set hlsearch!<CR>
 " Save as control s
 noremap <c-s> :source ~/.vimrc<CR>
 
-" Remove trailing whitespace on ctrl+w
+" Remove trailing whitespace on ctrl+q
 noremap <c-q> :%s/\s\+$//e<CR>
+
+" Remove whitespace from empty lines
+autocmd BufWritePre * :%s/^\s\+$//e
 
 " Highlight current line
 if exists('+colorcolumn')

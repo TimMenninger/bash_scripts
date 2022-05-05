@@ -8,6 +8,10 @@ export TD=~
 # Editor of choice
 export EDITOR=vim
 
+# Bash history
+export HISTFILESIZE=100000
+export HISTSIZE=-1
+
 alias scripts='cd $HOME/scripts'
 alias vim='stty -ixon;vim'
 alias vimrc='vim ~/.vimrc'
@@ -217,7 +221,9 @@ shopt -s checkwinsize
 # Time of last command and now so we can show duration of all commands
 PROMPT_COMMAND='build_ps1'
 
-shopt -s extdebug
+if [ -e /usr/share/bashdb/bashdb-main.inc ]; then
+    shopt -s extdebug
+fi
 preexec_invoke_exec() {
     [ -n "$COMP_LINE" ] && return # do nothing if completing
     [ ":" == "$BASH_COMMAND" ] && return
@@ -246,7 +252,7 @@ remove_trailing_slash() {
 }
 
 build_ps1() {
-    export PS1='\[\033[0;39m\]\W $ '
+    export PS1='\[\033[0;39m\]\!: \W $ '
 
     RUNTIME=
     if [ ! -z $LAST_CMD_START_TIME ]; then
@@ -283,8 +289,27 @@ build_ps1() {
         printf '%*s' $(($COLUMNS)) | tr ' ' ' '
         RUNTIME="$(date +%H:%M:%S) (Elapsed: $TIME_STR)"
 
+        PS1_LINE_COLOR=
+        case "$(hostname)" in
+            irdv*) # dev VM
+                PS1_LINE_COLOR='\[\033[104m\]' # blue
+                ;;
+            *irp*h01) # initiator
+                PS1_LINE_COLOR='\[\033[105m\]' # pink
+                ;;
+            *irp*) # fm
+                PS1_LINE_COLOR='\[\033[101m\]' # red
+                ;;
+            ch*-fb*) # blade
+                PS1_LINE_COLOR='\[\033[102m\]' # green
+                ;;
+            *) # others
+                PS1_LINE_COLOR='\[\033[100m\]' # gray
+                ;;
+        esac
+
         # parse git branch from https://coderwall.com/p/fasnya/add-git-branch-name-to-bash-prompt
-        export PS1='\n\[\033[31m\]\u@\h:\[\033[1;35m\]$(remove_trailing_slash $(dirname \w))/$(basename \w)\[\033[1;33m\]$(parse_git_branch)\[\033[39m\]\[\033[104m\]\n${RUNTIME}\[\033[49m\]\n\[\033[0;39m\]\W $ '
+        export PS1='\n\[\033[31m\]\u@\h:\[\033[1;35m\]$(remove_trailing_slash $(dirname \w))/$(basename \w)\[\033[1;33m\]$(parse_git_branch)\[\033[39m\]'${PS1_LINE_COLOR}'\n${RUNTIME}\[\033[49m\]\n\[\033[0;39m\]\!: \W $ '
     fi
 
     # Print a bar the width of the command prompt (character goes inside second 

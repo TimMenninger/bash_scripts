@@ -16,6 +16,9 @@ while [[ $# -gt 0 ]]; do
         shift # past argument
         shift # past value
         ;;
+    --falls-through)
+        echo "falling through"
+        ;;&
     --default)
         DEFAULT=YES
         shift # past argument

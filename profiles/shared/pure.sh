@@ -2,6 +2,67 @@
 
 alias vm="ssh root@irdv-tmenninger"
 
+export PATH=$PATH:/usr/local/go/bin
+
+function cp2c() {
+    CLUSTER=$1
+    if [ -z "$CLUSTER" ]; then
+        echo "usage: key <CLUSTER>"
+        exit 1
+    fi
+
+    PROFILES=(
+        ".quiltrc"
+        ".vimrc"
+        ".bashrc"
+    )
+
+    # SSH key
+    ssh-copy-id -i ~/.ssh/id_rsa.pub ir@${CLUSTER}
+    ssh-copy-id -i ~/.ssh/id_rsa.pub ir@${CLUSTER}h01
+
+    # copy to initiator and leader FM
+    for host in ${CLUSTER} ${CLUSTER}h01; do
+        ssh ir@${host} "mkdir -p /home/ir/scripts/tmenninger"
+        scp -r /scripts/profiles ir@${host}:/home/ir/scripts/tmenninger
+
+        for profile in ${PROFILES[@]}; do
+            scp ~/${profile} ir@${host}:/home/ir
+            ssh ir@${host} "sudo bash -c \"cp /home/ir/${profile} /root/\""
+        done
+    done
+
+    # copy scripts to all blades
+    ssh ir@${CLUSTER}    "exec.py -na \"sudo bash -c \\\"scp -r sup:/home/ir/scripts/ /home/ir/\\\"\""
+    ssh ir@${CLUSTER}                                   "scp -r /home/ir/scripts/ supr:/home/ir/"
+
+    ssh ir@${CLUSTER}    "exec.py                      \"cd /      && sudo ln -sf /home/ir/scripts\""
+    ssh ir@${CLUSTER}    "exec.py     \"sudo bash -c \\\"cd /root/ &&      ln -sf /scripts\\\"\""
+
+    ssh ir@${CLUSTER}h01                                "cd /      && sudo ln -sf /home/ir/scripts"
+    ssh ir@${CLUSTER}h01               "sudo bash -c   \"cd /root/ &&      ln -sf /scripts\""
+
+    # do profiles
+    for profile in ${PROFILES[@]}; do
+        ssh ir@${CLUSTER} "exec.py \"sudo bash -c \\\"scp sup:/home/ir/${profile} /home/ir/\\\"\""
+        ssh ir@${CLUSTER} "exec.py \"sudo bash -c \\\"ln -sf /home/ir/${profile} /root/${profile}\\\"\""
+    done
+}
+
+function nested_vm() {
+    if [ $# -ne 2 ]; then
+        echo "usage: nested_vm <VM_NAME> <IMG_PATH>"
+        return 1
+    fi
+
+    NAME=$1
+    IMG=$2
+
+    virsh destroy $NAME
+    virsh undefine $NAME
+    virt-install --name $NAME --ram 2048 --vcpu 4 --disk $IMG --import --os-variant ubuntutrusty
+}
+
 function smeld() {
     if [ $# -ne 2 ]; then
         echo "Must give 2 files"

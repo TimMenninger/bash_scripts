@@ -1,0 +1,3 @@
+[submodule "pure"]
+	path = pure
+	url = ssh://git@bitbucket.purestorage.com:7999/~tmenninger/scripts.git

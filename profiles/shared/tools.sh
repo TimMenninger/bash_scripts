@@ -140,7 +140,7 @@ function mkdir() {
     /bin/mkdir -p $@
 }
 function cp() {
-    /bin/cp -rP $@
+    /bin/cp -r $@
 }
 
 # uncomment for a colored prompt, if the terminal has the capability; turned

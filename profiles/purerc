@@ -1,5 +1,11 @@
 #!/bin/bash -l
 
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
 SCRIPTS_PATH="${HOME}/scripts/tmenninger"
 
 # Bash profile

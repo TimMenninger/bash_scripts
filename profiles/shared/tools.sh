@@ -9,8 +9,8 @@ export TD=~
 export EDITOR=vim
 
 # Bash history
-export HISTFILESIZE=100000
-export HISTSIZE=-1
+export HISTFILESIZE=1000000
+export HISTSIZE=100000
 
 alias scripts='cd $HOME/scripts'
 alias vim='stty -ixon;vim'

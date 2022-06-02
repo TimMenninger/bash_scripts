@@ -9,7 +9,7 @@ def dbg(msg):
 def cmd(cmd, suppress_errors=False):
     dbg("running: {}".format(cmd))
     try:
-        subprocess.check_call([cmd], shell=True)
+        stdout = subprocess.check_output([cmd], shell=True)
     except Exception as e:
         if suppress_errors:
             print(e)

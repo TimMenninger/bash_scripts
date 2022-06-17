@@ -1,5 +1,5 @@
 #!/bin/bash
-sleep 100
+
 # Make sure we have some variables
 if [ "$SCRIPTPATH" -eq "" ]; then
     echo "WARNING: SCRIPTPATH variable not set!  This is used to find helper scripts"
@@ -7,7 +7,6 @@ else
     # Make sure scripts are up to date
     (cd ${SCRIPTPATH}/.. && git pull &>/dev/null)
 fi
-echo "HI"
 
 if [ "$BASH_PROFILE" -eq "" ]; then
     echo "WARNING: BASH_PROFILE  variable not set!  This is used for sourcebash"

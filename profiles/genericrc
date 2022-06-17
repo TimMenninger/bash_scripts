@@ -1,5 +1,5 @@
 #!/bin/bash
-
+sleep 100
 # Make sure we have some variables
 if [ "$SCRIPTPATH" -eq "" ]; then
     echo "WARNING: SCRIPTPATH variable not set!  This is used to find helper scripts"

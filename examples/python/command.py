@@ -15,3 +15,19 @@ def cmd(cmd, suppress_errors=False):
             print(e)
         else:
             raise
+
+def run(cmd, suppress_errors=False):
+    print('>>> {cmd}'.format(**locals()))
+    p = subprocess.Popen(cmd,
+                         stdout=subprocess.PIPE,
+                         stderr=subprocess.STDOUT,
+                         shell=True)
+    while True:
+        line = p.stdout.readline().decode("utf-8").replace("\n", "")
+        if not line:
+            break
+        print(line)
+
+    p.communicate()
+    if not suppress_errors:
+        assert(p.returncode == 0)

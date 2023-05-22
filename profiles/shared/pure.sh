@@ -2,7 +2,8 @@
 
 alias vm="ssh root@irdv-tmenninger"
 
-export PATH=$PATH:/usr/local/go/bin
+export PATH=/usr/local/go/bin:$PATH
+export PATH=$SCRIPTS_PATH/pure/tools:$PATH
 
 function cp2c() {
     CLUSTER=$1
@@ -11,6 +12,8 @@ function cp2c() {
         exit 1
     fi
 
+    CLUSTER_IP=$(nslookup irp222-c05 | grep Server | sed "s/Server:\s*//")
+
     PROFILES=(
         ".quiltrc"
         ".vimrc"
@@ -18,6 +21,8 @@ function cp2c() {
     )
 
     # SSH key
+    ssh-keygen -R ${CLUSTER}
+    ssh-keygen -R ${CLUSTER_IP}
     ssh-copy-id -i ~/.ssh/id_rsa.pub ir@${CLUSTER}
     ssh-copy-id -i ~/.ssh/id_rsa.pub ir@${CLUSTER}h01
 
@@ -131,4 +136,3 @@ function ssh_key() {
     # add the SSH private key into the SSH authentication agent
     yes "" | ssh-add
 }
-

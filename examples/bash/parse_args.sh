@@ -7,21 +7,18 @@ POSITIONAL_ARGS=()
 while [[ $# -gt 0 ]]; do
     case $1 in
     -e|--extension)
-        EXTENSION="$2"
-        shift # past argument
-        shift # past value
+        shift # past option
+        EXTENSION="$1"
         ;;
     -s|--searchpath)
-        SEARCHPATH="$2"
-        shift # past argument
-        shift # past value
+        shift # past option
+        SEARCHPATH="$1"
         ;;
     --falls-through)
         echo "falling through"
         ;;&
     --default)
         DEFAULT=YES
-        shift # past argument
         ;;
     -*|--*)
         echo "Unknown option $1"
@@ -29,9 +26,9 @@ while [[ $# -gt 0 ]]; do
         ;;
     *)
         POSITIONAL_ARGS+=("$1") # save positional arg
-        shift # past argument
         ;;
     esac
+    shift # past argument
 done
 
 set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters

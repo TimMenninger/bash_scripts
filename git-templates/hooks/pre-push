@@ -1,0 +1,28 @@
+#!/bin/bash
+
+################################################################################
+#
+# CHECK FOR POISON STRINGS BEFORE PUSH
+# If any of these are in the repo, pushing will fail. Use --no-verify to skip
+# this check and push anyway.
+#
+
+# Poison these strings
+MAGIC_POISON_STRINGS=(
+    "\<NO *MERGE\>"
+    "\<NO *COMMIT\>"
+    "\<NO *PUSH\>"
+)
+MAGIC_POISON_REGEX="$(export IFS="|"; echo "${MAGIC_POISON_STRINGS[*]}")"
+
+# Ignore these files/directories (files not tracked by git are ignored by default)
+IGNORE=(
+    "*/vendor/*"
+    "*/tpc/*"
+)
+IGNORE_OPTIONS=$(printf ":!%s " "${IGNORE[@]}")
+
+if git grep -n -I -E "$MAGIC_POISON_REGEX" -- $IGNORE_OPTIONS; then
+    echo "The above files have poison strings! Try again with --no-verify to ignore."
+    exit 1
+fi

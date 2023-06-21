@@ -247,7 +247,7 @@ preexec_invoke_exec() {
     # Store time
     if [ -z $LAST_CMD_START_TIME ]; then
         LAST_CMD_START_TIME=$(date '+%s')
-        printf "\033[1;39m$(date +%H:%M:%S)\033[0;39m\n"
+        printf "\033[1;39m$(date +"%Y-%m-%d %H:%M:%S")\033[0;39m\n"
     fi
 }
 trap 'preexec_invoke_exec' DEBUG

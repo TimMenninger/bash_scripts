@@ -12,6 +12,9 @@ export EDITOR=vim
 export HISTFILESIZE=1000000
 export HISTSIZE=100000
 
+# Default grep args
+export GRARGS=" --exclude tags --exclude *.swp --exclude *.swo --exclude-dir \.git"
+
 alias scripts='cd $HOME/scripts'
 alias vim='stty -ixon;vim'
 alias vimrc='vim ~/.vimrc'
@@ -23,6 +26,11 @@ alias desktop='cd ~/Desktop'
 alias downloads='cd ~/Downloads'
 alias ll='ls -lah --color'
 alias please='sudo !!'
+alias cb='git branch --show-current'
+alias cs='git rev-parse HEAD'
+alias css='git rev-parse --short HEAD'
+alias nd='pushd'
+alias pd='popd'
 
 ####### M A C   O V E R R I D E S #######
 if [[ "$(uname -s)" == Darwin* ]]; then
@@ -33,6 +41,26 @@ if [[ "$(uname -s)" == Darwin* ]]; then
     # Make background random color
     ${SCRIPTS_PATH}/tools/mac_terminal_random_bg.scpt
 fi
+
+function bak() {
+    if [ -z "$1" ]; then
+        echo "usage: bak <FNAME>"
+        return 1
+    fi
+    cp "$1" "$1".bak
+}
+
+function unbak() {
+    if [ -z "$1" ]; then
+        echo "usage: bak <FNAME.bak>"
+        return 1
+    fi
+    mv "$1" "$(echo "$1" | sed -e "s/\.bak$//")"
+}
+
+function fvim() {
+    vim $(find . -name $1)
+}
 
 function decolor() {
     # From https://unix.stackexchange.com/questions/111899/how-to-strip-color-codes-out-of-stdout-and-pipe-to-file-and-stdout
@@ -219,7 +247,7 @@ preexec_invoke_exec() {
     # Store time
     if [ -z $LAST_CMD_START_TIME ]; then
         LAST_CMD_START_TIME=$(date '+%s')
-        printf "\033[1;39m$(date +%H:%M:%S)\033[0;39m\n"
+        printf "\033[1;39m$(date +"%Y-%m-%d %H:%M:%S")\033[0;39m\n"
     fi
 }
 trap 'preexec_invoke_exec' DEBUG
@@ -234,6 +262,7 @@ remove_trailing_slash() {
 }
 
 build_ps1() {
+    RC="$?"
     export PS1='\[\033[0;39m\]\!: \W $ '
 
     RUNTIME=
@@ -269,20 +298,20 @@ build_ps1() {
 
 
         printf '%*s' $(($COLUMNS)) | tr ' ' ' '
-        RUNTIME="$(date +%H:%M:%S) (Elapsed: $TIME_STR)"
+        RUNTIME="$(date +%H:%M:%S) (Elapsed: $TIME_STR RC: $RC)"
 
         PS1_LINE_COLOR=
         case "$(hostname)" in
             irdv*) # dev VM
                 PS1_LINE_COLOR='\[\033[104m\]' # blue
                 ;;
-            *irp*h01) # initiator
+            mcib*2204*) # U22 container
                 PS1_LINE_COLOR='\[\033[105m\]' # pink
                 ;;
-            *irp*) # fm
+            mcib*1804*) # U18 container
                 PS1_LINE_COLOR='\[\033[101m\]' # red
                 ;;
-            ch*-fb*) # blade
+            mcib*) # other container
                 PS1_LINE_COLOR='\[\033[102m\]' # green
                 ;;
             *) # others

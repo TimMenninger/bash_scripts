@@ -1,0 +1,7 @@
+source $HOME/scripts/tmenninger/profiles/purerc
+
+sudo /home/ir/iridium/tools/df-autofs/install.sh 2&>/dev/null &
+sudo jira-signature update 2&>/dev/null &
+git config --global user.email "tmenninger@purestorage.com" 2&>/dev/null &
+git config --global user.name "Tim Menninger" 2&>/dev/null &
+wait

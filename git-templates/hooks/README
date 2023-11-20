@@ -1,0 +1,4 @@
+For these to automagically get copied to new git repos, run
+    git config --global init.templatedir '/path/to/scripts/git-templates'
+
+Reference: https://coderwall.com/p/jp7d5q/create-a-global-git-commit-hook

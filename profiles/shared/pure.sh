@@ -1,9 +1,11 @@
 #!/bin/bash -l
 
 alias vm="ssh root@irdv-tmenninger"
+alias sf="/home/ir/scripts/tmenninger/pure/sync_forks.py -b master -B ^users/tmenninger/,^feature/ -j 16"
 
 export PATH=/usr/local/go/bin:$PATH
 export PATH=$SCRIPTS_PATH/pure/tools:$PATH
+export PATH=/ir-scripts/ebadger:$PATH
 
 function cp2c() {
     CLUSTER=$1

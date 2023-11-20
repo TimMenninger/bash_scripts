@@ -262,6 +262,7 @@ remove_trailing_slash() {
 }
 
 build_ps1() {
+    RC="$?"
     export PS1='\[\033[0;39m\]\!: \W $ '
 
     RUNTIME=
@@ -297,7 +298,7 @@ build_ps1() {
 
 
         printf '%*s' $(($COLUMNS)) | tr ' ' ' '
-        RUNTIME="$(date +%H:%M:%S) (Elapsed: $TIME_STR)"
+        RUNTIME="$(date +%H:%M:%S) (Elapsed: $TIME_STR RC: $RC)"
 
         PS1_LINE_COLOR=
         case "$(hostname)" in

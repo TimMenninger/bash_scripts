@@ -1,6 +1,6 @@
 #!/bin/bash -l
 
-alias vm="ssh root@irdv-tmenninger"
+alias vm="ssh ir@irdv-tmenninger"
 
 export PATH=$PATH:/usr/local/go/bin
 

@@ -1,0 +1,22 @@
+#!/bin/bash -l
+
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
+SCRIPTS_PATH="${HOME}/scripts/tmenninger"
+
+# Bash profile
+export BASH_PROFILE="${HOME}/.bashrc"
+
+# Make sure scripts are up to date
+(cd ${SCRIPTS_PATH} && git pull &>/dev/null)
+
+# Pure Storage stuff
+source ${SCRIPTS_PATH}/profiles/shared/pure.sh
+
+# Common tools
+source ${SCRIPTS_PATH}/profiles/shared/tools.sh
+

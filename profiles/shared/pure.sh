@@ -1,11 +1,28 @@
 #!/bin/bash -l
 
 alias vm="ssh ir@irdv-tmenninger"
+alias sim="irssh 10.255.8.20"
 alias sf="/home/ir/scripts/tmenninger/pure/sync_forks.py -b master -B ^users/tmenninger/,^feature/ -j 16"
 
 export PATH=/usr/local/go/bin:$PATH
 export PATH=$SCRIPTS_PATH/pure/tools:$PATH
 export PATH=/ir-scripts/ebadger:$PATH
+
+alias ssh="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+
+function irssh() {
+    sshpass -p welcome ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=5 ir@$*
+}
+
+function irscp() {
+    sshpass -p welcome scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $@
+}
+
+function gra() {
+    username=$1
+    git remote add $1 https://github.com/pure-forks/$1-iridium.git
+    git fetch $1
+}
 
 function cp2c() {
     CLUSTER=$1

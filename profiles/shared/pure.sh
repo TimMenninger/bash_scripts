@@ -10,6 +10,16 @@ export PATH=/ir-scripts/ebadger:$PATH
 
 alias ssh="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 
+function ppkg() {
+    local job="$1"
+    if [[ ! "$job" =~ .*setup_details.txt ]]; then
+        job="$job/artifact/setup_details.txt"
+    fi
+    ppkg="$(curl --silent "$job" | grep -E '^ppkg_url=' | sed 's/.*=//')"
+    echo "$ppkg"
+    echo "pureinstall $ppkg && pureboot reboot --offline"
+}
+
 function irssh() {
     sshpass -p welcome ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=5 ir@$*
 }

@@ -302,17 +302,17 @@ build_ps1() {
 
         PS1_LINE_COLOR=
         case "$(hostname)" in
-            irdv*) # dev VM
-                PS1_LINE_COLOR='\[\033[104m\]' # blue
-                ;;
-            mcib*2204*) # U22 container
-                PS1_LINE_COLOR='\[\033[105m\]' # pink
-                ;;
-            mcib*1804*) # U18 container
+            dev*) # FA dev VM
                 PS1_LINE_COLOR='\[\033[101m\]' # red
                 ;;
-            mcib*) # other container
+            irdv*) # FB dev VM
+                PS1_LINE_COLOR='\[\033[104m\]' # blue
+                ;;
+            mcib*2404*)
                 PS1_LINE_COLOR='\[\033[102m\]' # green
+                ;;
+            mcib*)
+                PS1_LINE_COLOR='\[\033[106m\]' # cyan
                 ;;
             *) # others
                 PS1_LINE_COLOR='\[\033[100m\]' # gray

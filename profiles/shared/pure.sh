@@ -1,6 +1,8 @@
 #!/bin/bash -l
 
-alias vm="ssh ir@irdv-tmenninger"
+alias vm="ssh -A ir@irdv-tmenninger"
+alias fb="vm"
+alias fa="ssh -A tmenninger@dev-tmenninger"
 alias sim="irssh 10.255.8.20"
 alias sf="/home/ir/scripts/tmenninger/pure/sync_forks.py -b master -B ^users/tmenninger/,^feature/ -j 16"
 

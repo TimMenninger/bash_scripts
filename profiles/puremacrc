@@ -20,3 +20,10 @@ source ${SCRIPTS_PATH}/profiles/shared/pure.sh
 # Common tools
 source ${SCRIPTS_PATH}/profiles/shared/tools.sh
 
+ssh-add /Users/tmenninger/.ssh/id_pure_root
+
+# https://purestorage.atlassian.net/wiki/spaces/GHE/pages/4081615105/Migrate+from+SSH+Keys+or+OAuth+to+SSH+Certificates
+export VAULT_ADDR=https://vault.purestorage.com
+export PURELOGIN_VAULT=1
+export PURELOGIN_VAULT_STORE_TOKEN=1
+export PURELOGIN_OVERWRITE_VAULT_CERT=1
